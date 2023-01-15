@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public interface ICivilizations {
+public interface ICivilizationRepository {
     @Nullable
     Civilization getCivilizationByCitizen(@NotNull Entity entity);
 

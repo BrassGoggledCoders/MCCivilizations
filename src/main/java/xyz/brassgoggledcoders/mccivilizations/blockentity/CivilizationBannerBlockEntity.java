@@ -30,6 +30,7 @@ public class CivilizationBannerBlockEntity extends BannerBlockEntity {
             this.civilizationUUID = null;
         } else {
             this.fromItem(civilization.getBanner());
+            this.setCustomName(civilization.getName());
         }
     }
 

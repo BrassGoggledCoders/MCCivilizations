@@ -3,13 +3,13 @@ package xyz.brassgoggledcoders.mccivilizations.claim;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
 
 public class ClientClaimedLand implements IClaimedLand {
-    private final ICivilizations civilizations;
+    private final ICivilizationRepository civilizations;
 
-    public ClientClaimedLand(ICivilizations civilizations) {
+    public ClientClaimedLand(ICivilizationRepository civilizations) {
         this.civilizations = civilizations;
     }
 

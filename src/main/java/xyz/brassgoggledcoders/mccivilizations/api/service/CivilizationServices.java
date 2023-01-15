@@ -3,7 +3,7 @@ package xyz.brassgoggledcoders.mccivilizations.api.service;
 import com.google.common.base.Suppliers;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
 
 import java.util.ServiceLoader;
@@ -20,7 +20,7 @@ public class CivilizationServices {
         return SERVICE_PROVIDER.get().getClaimedLand(level);
     }
 
-    public static ICivilizations getCivilizationService(@Nullable Level level) {
+    public static ICivilizationRepository getCivilizationService(@Nullable Level level) {
         return SERVICE_PROVIDER.get().getCivilizations(level);
     }
 

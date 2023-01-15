@@ -10,7 +10,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
 
 import java.util.*;
@@ -18,15 +18,15 @@ import java.util.*;
 public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
     private final Map<ChunkPos, UUID> claimsByPos;
     private final Multimap<UUID, ChunkPos> claimsByOwner;
-    private final ICivilizations civilizations;
+    private final ICivilizationRepository civilizations;
 
-    public ClaimedLandSavedData(ICivilizations civilizations) {
+    public ClaimedLandSavedData(ICivilizationRepository civilizations) {
         this.civilizations = civilizations;
         this.claimsByPos = new HashMap<>();
         this.claimsByOwner = HashMultimap.create();
     }
 
-    public ClaimedLandSavedData(ICivilizations civilizations, CompoundTag compoundTag) {
+    public ClaimedLandSavedData(ICivilizationRepository civilizations, CompoundTag compoundTag) {
         this(civilizations);
         ListTag claimListTag = compoundTag.getList("Claims", Tag.TAG_COMPOUND);
         for (int i = 0; i < claimListTag.size(); i++) {

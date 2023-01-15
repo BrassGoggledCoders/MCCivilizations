@@ -25,7 +25,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
 import xyz.brassgoggledcoders.mccivilizations.blockentity.CivilizationBannerBlockEntity;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
@@ -50,7 +50,7 @@ public class CivilizationBannerBlock extends AbstractBannerBlock {
     @ParametersAreNonnullByDefault
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         if (pPlacer instanceof Player player && pLevel.getBlockEntity(pPos) instanceof CivilizationBannerBlockEntity bannerBlockEntity) {
-            ICivilizations civilizations = CivilizationServices.getCivilizationService(pLevel);
+            ICivilizationRepository civilizations = CivilizationServices.getCivilizationService(pLevel);
             Civilization playerCivilization = civilizations.getCivilizationByCitizen(player);
             if (playerCivilization != null) {
                 bannerBlockEntity.setCivilizationUUID(playerCivilization.getId());
@@ -95,7 +95,7 @@ public class CivilizationBannerBlock extends AbstractBannerBlock {
     @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        ICivilizations civilizations = CivilizationServices.getCivilizationService(pContext.getLevel());
+        ICivilizationRepository civilizations = CivilizationServices.getCivilizationService(pContext.getLevel());
         if (pContext.getPlayer() != null) {
             Civilization playerCivilization = civilizations.getCivilizationByCitizen(pContext.getPlayer());
             if ((playerCivilization == null) == (this.bannerType == CivilizationBannerType.CAPITAL)) {

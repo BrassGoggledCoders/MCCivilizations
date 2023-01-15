@@ -3,7 +3,7 @@ package xyz.brassgoggledcoders.mccivilizations.service;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
 import xyz.brassgoggledcoders.mccivilizations.api.service.ICivilizationServiceProvider;
 import xyz.brassgoggledcoders.mccivilizations.civilization.Civilizations;
@@ -12,11 +12,11 @@ import xyz.brassgoggledcoders.mccivilizations.claim.ClientClaimedLand;
 
 public class CivilizationServiceProvider implements ICivilizationServiceProvider {
     private final Civilizations clientCivilizations = new Civilizations();
-    private ICivilizations serverCivilizations = new Civilizations();
+    private ICivilizationRepository serverCivilizations = new Civilizations();
     private final IClaimedLand clientClaims = new ClientClaimedLand(clientCivilizations);
 
     @Override
-    public ICivilizations getCivilizations(@Nullable Level level) {
+    public ICivilizationRepository getCivilizations(@Nullable Level level) {
         if (level instanceof ServerLevel) {
             return serverCivilizations;
         } else {
@@ -38,7 +38,7 @@ public class CivilizationServiceProvider implements ICivilizationServiceProvider
         }
     }
 
-    public void setServerCivilizations(ICivilizations civilizations) {
+    public void setServerCivilizations(ICivilizationRepository civilizations) {
         this.serverCivilizations = civilizations;
     }
 }

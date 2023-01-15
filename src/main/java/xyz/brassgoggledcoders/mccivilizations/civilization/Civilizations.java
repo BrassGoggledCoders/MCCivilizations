@@ -3,14 +3,14 @@ package xyz.brassgoggledcoders.mccivilizations.civilization;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Civilizations implements ICivilizations {
+public class Civilizations implements ICivilizationRepository {
     private final Map<UUID, Civilization> civilizationById;
     private final Map<UUID, UUID> civilizationByCitizen;
 

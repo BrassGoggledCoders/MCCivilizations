@@ -15,6 +15,12 @@ public class Civilization {
     public Civilization(UUID id, Component name, ItemStack banner) {
         this.id = id;
         this.name = name;
+        this.banner = banner;
+    }
+
+    @NotNull
+    public UUID getId() {
+        return id;
     }
 
     public void setName(Component name) {
@@ -25,10 +31,6 @@ public class Civilization {
         return name;
     }
 
-    @NotNull
-    public UUID getId() {
-        return id;
-    }
 
     public void setBanner(ItemStack itemStack) {
         this.banner = itemStack;
