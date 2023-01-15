@@ -41,14 +41,16 @@ public class CivilizationsSavedData extends SavedData implements ICivilizations 
     }
 
     @Override
-    public void createCivilization(Civilization civilization) {
+    public void upsertCivilization(Civilization civilization) {
         this.civilizationsById.put(civilization.getId(), civilization);
+        this.setDirty();
     }
 
     @Override
     public void joinCivilization(Civilization newCivilization, Entity player) {
         if (this.civilizationsById.containsKey(newCivilization.getId())) {
             this.civilizationsByCitizen.put(player.getUUID(), newCivilization.getId());
+            this.setDirty();
         }
     }
 

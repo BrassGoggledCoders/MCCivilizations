@@ -3,22 +3,17 @@ package xyz.brassgoggledcoders.mccivilizations.claim;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
+import java.util.*;
 
 public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
     private final Map<ChunkPos, UUID> claimsByPos;
@@ -33,11 +28,26 @@ public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
 
     public ClaimedLandSavedData(ICivilizations civilizations, CompoundTag compoundTag) {
         this(civilizations);
+        ListTag claimListTag = compoundTag.getList("Claims", Tag.TAG_COMPOUND);
+        for (int i = 0; i < claimListTag.size(); i++) {
+            CompoundTag civilizationClaims = claimListTag.getCompound(i);
+            UUID civilizationId = civilizationClaims.getUUID("Civilization");
+            ListTag claimsList = civilizationClaims.getList("Claims", Tag.TAG_COMPOUND);
+            for (int j = 0; j < claimsList.size(); j++) {
+                CompoundTag chunkPosTag = claimsList.getCompound(j);
+                ChunkPos chunkPos = new ChunkPos(
+                        chunkPosTag.getInt("X"),
+                        chunkPosTag.getInt("Z")
+                );
+                this.claimsByOwner.put(civilizationId, chunkPos);
+                this.claimsByPos.put(chunkPos, civilizationId);
+            }
+        }
     }
 
     @Override
     public boolean isClaimed(ChunkPos chunkPos) {
-        return false;
+        return this.claimsByPos.containsKey(chunkPos);
     }
 
     @Override
@@ -50,7 +60,12 @@ public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
 
     @Override
     public void addClaim(Civilization civilization, ChunkPos chunkPos) {
-        this.claimsByPos.put(chunkPos, civilization.getId());
+        if (!this.claimsByPos.containsKey(chunkPos)) {
+            this.claimsByPos.put(chunkPos, civilization.getId());
+            this.claimsByOwner.put(civilization.getId(), chunkPos);
+            this.setDirty();
+        }
+
     }
 
     private Civilization getCivilization(UUID uuid) {
@@ -60,6 +75,20 @@ public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
     @Override
     @NotNull
     public CompoundTag save(@NotNull CompoundTag pCompoundTag) {
+        ListTag claimListTag = new ListTag();
+        for (Map.Entry<UUID, Collection<ChunkPos>> entry : this.claimsByOwner.asMap().entrySet()) {
+            ListTag listTag = new ListTag();
+            for (ChunkPos chunkPos : entry.getValue()) {
+                CompoundTag chunkNBT = new CompoundTag();
+                chunkNBT.putInt("X", chunkPos.x);
+                chunkNBT.putInt("Z", chunkPos.z);
+                listTag.add(chunkNBT);
+            }
+            CompoundTag claimTag = new CompoundTag();
+            claimTag.putUUID("Civilization", entry.getKey());
+            claimTag.put("Claims", listTag);
+        }
+        pCompoundTag.put("Claims", claimListTag);
         return pCompoundTag;
     }
 }
