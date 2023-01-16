@@ -4,12 +4,12 @@ import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 
-public class ClientClaimedLand implements IClaimedLand {
+public class ClientLandClaimRepository implements ILandClaimRepository {
     private final ICivilizationRepository civilizations;
 
-    public ClientClaimedLand(ICivilizationRepository civilizations) {
+    public ClientLandClaimRepository(ICivilizationRepository civilizations) {
         this.civilizations = civilizations;
     }
 

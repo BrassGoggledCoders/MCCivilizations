@@ -11,22 +11,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.*;
 
-public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
+public class LandClaimRepository extends Repository implements ILandClaimRepository {
     private final Map<ChunkPos, UUID> claimsByPos;
     private final Multimap<UUID, ChunkPos> claimsByOwner;
     private final ICivilizationRepository civilizations;
 
-    public ClaimedLandSavedData(ICivilizationRepository civilizations) {
+    public LandClaimRepository(ICivilizationRepository civilizations) {
         this.civilizations = civilizations;
         this.claimsByPos = new HashMap<>();
         this.claimsByOwner = HashMultimap.create();
     }
 
-    public ClaimedLandSavedData(ICivilizationRepository civilizations, CompoundTag compoundTag) {
+    public LandClaimRepository(ICivilizationRepository civilizations) {
         this(civilizations);
         ListTag claimListTag = compoundTag.getList("Claims", Tag.TAG_COMPOUND);
         for (int i = 0; i < claimListTag.size(); i++) {
@@ -63,7 +64,7 @@ public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
         if (!this.claimsByPos.containsKey(chunkPos)) {
             this.claimsByPos.put(chunkPos, civilization.getId());
             this.claimsByOwner.put(civilization.getId(), chunkPos);
-            this.setDirty();
+            this.setDirty(true);
         }
 
     }
@@ -90,5 +91,15 @@ public class ClaimedLandSavedData extends SavedData implements IClaimedLand {
         }
         pCompoundTag.put("Claims", claimListTag);
         return pCompoundTag;
+    }
+
+    @Override
+    public Map<String, CompoundTag> getSerializedValuesToSave() {
+        return null;
+    }
+
+    @Override
+    public void deserializeAndInsertValue(CompoundTag tag) {
+
     }
 }

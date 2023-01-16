@@ -4,27 +4,27 @@ import com.google.common.base.Suppliers;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
 public class CivilizationServices {
-    private static final Supplier<ICivilizationServiceProvider> SERVICE_PROVIDER = Suppliers.memoize(
-            () -> ServiceLoader.load(ICivilizationServiceProvider.class)
+    private static final Supplier<ICivilizationRepositoryProvider> SERVICE_PROVIDER = Suppliers.memoize(
+            () -> ServiceLoader.load(ICivilizationRepositoryProvider.class)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Failed to Find Civilization Service Provider"))
     );
 
-    public static IClaimedLand getClaimedLand(@Nullable Level level) {
-        return SERVICE_PROVIDER.get().getClaimedLand(level);
+    public static ILandClaimRepository getClaimedLand(@Nullable Level level) {
+        return SERVICE_PROVIDER.get().getLandClaimRepository(level);
     }
 
     public static ICivilizationRepository getCivilizationService(@Nullable Level level) {
-        return SERVICE_PROVIDER.get().getCivilizations(level);
+        return SERVICE_PROVIDER.get().getCivilizationRepository();
     }
 
-    public static ICivilizationServiceProvider getProvider() {
+    public static ICivilizationRepositoryProvider getProvider() {
         return SERVICE_PROVIDER.get();
     }
 

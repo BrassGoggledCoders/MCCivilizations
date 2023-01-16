@@ -6,6 +6,7 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 
 import java.io.File;
@@ -17,25 +18,30 @@ import java.util.List;
 import java.util.Map;
 
 public class RepositoryManager {
+    public static RepositoryManager INSTANCE = null;
+
     private static final LevelResource REPOSITORY_FOLDER = new LevelResource("mccivilizations");
     private final MinecraftServer minecraftServer;
 
     private final CivilizationRepository civilizationRepository;
-
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
         this.civilizationRepository = new CivilizationRepository();
     }
 
-    private List<? extends Repository<?, ?>> getRepositories() {
+    public ICivilizationRepository getCivilizationRepository() {
+        return this.civilizationRepository;
+    }
+
+    private List<? extends Repository> getRepositories() {
         return List.of(
                 this.civilizationRepository
         );
     }
 
     public void load() {
-        for (Repository<?, ?> repository : this.getRepositories()) {
+        for (Repository repository : this.getRepositories()) {
             File repositoryDirectory = this.minecraftServer.getWorldPath(REPOSITORY_FOLDER)
                     .resolve(repository.getName())
                     .toFile();
@@ -57,7 +63,7 @@ public class RepositoryManager {
     }
 
     public void save() {
-        for (Repository<?, ?> repository : this.getRepositories()) {
+        for (Repository repository : this.getRepositories()) {
             if (repository.isDirty()) {
                 File repositoryDirectory = this.minecraftServer.getWorldPath(REPOSITORY_FOLDER)
                         .resolve(repository.getName())
@@ -84,7 +90,6 @@ public class RepositoryManager {
                     }
                 }
             }
-
         }
     }
 }

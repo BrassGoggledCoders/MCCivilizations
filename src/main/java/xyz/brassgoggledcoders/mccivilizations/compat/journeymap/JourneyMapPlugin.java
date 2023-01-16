@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.claim.IClaimedLand;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 
 import java.util.EnumSet;
 
@@ -44,7 +44,7 @@ public class JourneyMapPlugin implements IClientPlugin {
         if (lastPosition != null && lastPosition.getChunkPos() != null) {
             ModPopupMenu civilizationsMenu = popupMenuEvent.getPopupMenu()
                     .createSubItemList("Civilizations");
-            IClaimedLand claimedLand = CivilizationServices.getClaimedLand(Minecraft.getInstance().level);
+            ILandClaimRepository claimedLand = CivilizationServices.getClaimedLand(Minecraft.getInstance().level);
             Civilization chunkCivilization = claimedLand.getClaimOwner(lastPosition.getChunkPos());
             Civilization userCivilization = CivilizationServices.getCivilizationService(Minecraft.getInstance().level)
                     .getCivilizationByCitizen(Minecraft.getInstance().player);

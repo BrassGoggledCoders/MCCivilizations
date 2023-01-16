@@ -1,5 +1,6 @@
 package xyz.brassgoggledcoders.mccivilizations.api.civilization;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -38,5 +39,21 @@ public class Civilization {
 
     public ItemStack getBanner() {
         return banner;
+    }
+
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putUUID("Id", this.getId());
+        tag.putString("Name", Component.Serializer.toJson(this.getName()));
+        tag.put("Banner", this.getBanner().save(new CompoundTag()));
+        return tag;
+    }
+
+    public static Civilization fromTag(CompoundTag tag) {
+        return new Civilization(
+                tag.getUUID("Id"),
+                Component.Serializer.fromJson(tag.getString("Name")),
+                ItemStack.of(tag.getCompound("Banner"))
+        );
     }
 }

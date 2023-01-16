@@ -2,10 +2,9 @@ package xyz.brassgoggledcoders.mccivilizations.repository;
 
 import net.minecraft.nbt.CompoundTag;
 
-import java.util.List;
 import java.util.Map;
 
-public abstract class Repository<K, V> {
+public abstract class Repository {
     private final String name;
     private boolean isDirty = false;
 

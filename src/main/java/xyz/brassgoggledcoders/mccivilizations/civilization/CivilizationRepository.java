@@ -1,6 +1,5 @@
 package xyz.brassgoggledcoders.mccivilizations.civilization;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CivilizationRepository extends Repository<UUID, Civilization> implements ICivilizationRepository {
+public class CivilizationRepository extends Repository implements ICivilizationRepository {
     private final Map<UUID, Civilization> civilizationsById;
     private final Map<UUID, UUID> civilizationsByCitizen;
 
@@ -49,5 +48,15 @@ public class CivilizationRepository extends Repository<UUID, Civilization> imple
             this.civilizationsByCitizen.put(player.getUUID(), newCivilization.getId());
             this.setDirty(true);
         }
+    }
+
+    @Override
+    public Map<String, CompoundTag> getSerializedValuesToSave() {
+        return null;
+    }
+
+    @Override
+    public void deserializeAndInsertValue(CompoundTag tag) {
+        Civilization civilization = Civilization.fromTag(tag);
     }
 }
