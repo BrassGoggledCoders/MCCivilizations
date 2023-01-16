@@ -1,0 +1,9 @@
+{
+  "type": "mccivilizations:transfer_banner_pattern",
+  "ingredient": {
+    "tag": "forge:ingots/gold"
+  },
+  "result": {
+    "item": "mccivilizations:capital_banner"
+  }
+}

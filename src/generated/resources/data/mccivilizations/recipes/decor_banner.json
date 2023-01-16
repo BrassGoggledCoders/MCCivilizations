@@ -1,0 +1,9 @@
+{
+  "type": "mccivilizations:transfer_banner_pattern",
+  "ingredient": {
+    "tag": "forge:ingots/copper"
+  },
+  "result": {
+    "item": "mccivilizations:decor_banner"
+  }
+}

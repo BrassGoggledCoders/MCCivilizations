@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
+import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
 
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class CivilizationBannerBlockEntity extends BannerBlockEntity {
 
     private Civilization getCivilization() {
         if (this.civilizationUUID != null) {
-            return CivilizationServices.getCivilizationService(this.getLevel())
+            return CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationById(this.civilizationUUID);
         }
 

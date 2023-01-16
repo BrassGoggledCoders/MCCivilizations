@@ -6,6 +6,8 @@ import com.tterrag.registrate.Registrate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsRecipes;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
 import java.util.function.Supplier;
@@ -20,6 +22,8 @@ public class MCCivilizations {
     private static final Supplier<Registrate> REGISTRATE = Suppliers.memoize(() -> Registrate.create(MODID));
 
     public MCCivilizations() {
+        MCCivilizationsBlocks.setup();
+        MCCivilizationsRecipes.setup();
         MCCivilizationsText.setup();
     }
 
