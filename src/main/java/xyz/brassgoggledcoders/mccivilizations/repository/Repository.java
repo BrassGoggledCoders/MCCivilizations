@@ -1,28 +1,39 @@
 package xyz.brassgoggledcoders.mccivilizations.repository;
 
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class Repository {
     private final String name;
-    private boolean isDirty = false;
+    private final List<UUID> dirtyIds;
 
     protected Repository(String name) {
         this.name = name;
+        this.dirtyIds = new ArrayList<>();
     }
 
     public boolean isDirty() {
-        return isDirty;
+        return !dirtyIds.isEmpty();
     }
 
-    public void setDirty(boolean dirty) {
-        isDirty = dirty;
+    public void addDirtyId(UUID dirty) {
+        this.dirtyIds.add(dirty);
     }
 
-    public abstract Map<String, CompoundTag> getSerializedValuesToSave();
+    public List<UUID> getDirtyIds() {
+        return this.dirtyIds;
+    }
 
-    public abstract void deserializeAndInsertValue(CompoundTag tag);
+    @Nullable
+    public abstract CompoundTag getSerializedValue(UUID id);
+
+    public abstract void deserializeAndInsertValue(@NotNull CompoundTag tag);
 
     public String getName() {
         return this.name;

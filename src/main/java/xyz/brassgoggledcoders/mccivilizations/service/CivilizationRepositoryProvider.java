@@ -25,14 +25,9 @@ public class CivilizationRepositoryProvider implements ICivilizationRepositoryPr
     }
 
     @Override
-    public ILandClaimRepository getLandClaimRepository(@Nullable Level level) {
-        if (level instanceof ServerLevel serverLevel) {
-            return serverLevel.getDataStorage()
-                    .computeIfAbsent(
-                            nbt -> new LandClaimRepository(serverCivilizations, nbt),
-                            () -> new LandClaimRepository(serverCivilizations),
-                            "claimed_land"
-                    );
+    public ILandClaimRepository getLandClaimRepository() {
+        if (RepositoryManager.INSTANCE != null) {
+            return RepositoryManager.INSTANCE.getLandClaimRepository();
         } else {
             return clientClaims;
         }

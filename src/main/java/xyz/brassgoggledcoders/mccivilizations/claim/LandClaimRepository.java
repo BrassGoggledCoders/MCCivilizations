@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
@@ -22,28 +21,10 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
     private final ICivilizationRepository civilizations;
 
     public LandClaimRepository(ICivilizationRepository civilizations) {
+        super("land_claims");
         this.civilizations = civilizations;
         this.claimsByPos = new HashMap<>();
         this.claimsByOwner = HashMultimap.create();
-    }
-
-    public LandClaimRepository(ICivilizationRepository civilizations) {
-        this(civilizations);
-        ListTag claimListTag = compoundTag.getList("Claims", Tag.TAG_COMPOUND);
-        for (int i = 0; i < claimListTag.size(); i++) {
-            CompoundTag civilizationClaims = claimListTag.getCompound(i);
-            UUID civilizationId = civilizationClaims.getUUID("Civilization");
-            ListTag claimsList = civilizationClaims.getList("Claims", Tag.TAG_COMPOUND);
-            for (int j = 0; j < claimsList.size(); j++) {
-                CompoundTag chunkPosTag = claimsList.getCompound(j);
-                ChunkPos chunkPos = new ChunkPos(
-                        chunkPosTag.getInt("X"),
-                        chunkPosTag.getInt("Z")
-                );
-                this.claimsByOwner.put(civilizationId, chunkPos);
-                this.claimsByPos.put(chunkPos, civilizationId);
-            }
-        }
     }
 
     @Override
@@ -64,7 +45,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         if (!this.claimsByPos.containsKey(chunkPos)) {
             this.claimsByPos.put(chunkPos, civilization.getId());
             this.claimsByOwner.put(civilization.getId(), chunkPos);
-            this.setDirty(true);
+            this.addDirtyId(civilization.getId());
         }
 
     }
@@ -75,31 +56,33 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
 
     @Override
     @NotNull
-    public CompoundTag save(@NotNull CompoundTag pCompoundTag) {
-        ListTag claimListTag = new ListTag();
-        for (Map.Entry<UUID, Collection<ChunkPos>> entry : this.claimsByOwner.asMap().entrySet()) {
-            ListTag listTag = new ListTag();
-            for (ChunkPos chunkPos : entry.getValue()) {
-                CompoundTag chunkNBT = new CompoundTag();
-                chunkNBT.putInt("X", chunkPos.x);
-                chunkNBT.putInt("Z", chunkPos.z);
-                listTag.add(chunkNBT);
-            }
-            CompoundTag claimTag = new CompoundTag();
-            claimTag.putUUID("Civilization", entry.getKey());
-            claimTag.put("Claims", listTag);
+    public CompoundTag getSerializedValue(UUID id) {
+        CompoundTag serializedValue = new CompoundTag();
+        ListTag listTag = new ListTag();
+        for (ChunkPos chunkPos : this.claimsByOwner.get(id)) {
+            CompoundTag chunkNBT = new CompoundTag();
+            chunkNBT.putInt("X", chunkPos.x);
+            chunkNBT.putInt("Z", chunkPos.z);
+            listTag.add(chunkNBT);
         }
-        pCompoundTag.put("Claims", claimListTag);
-        return pCompoundTag;
+        CompoundTag claimTag = new CompoundTag();
+        claimTag.putUUID("Civilization", id);
+        claimTag.put("Claims", listTag);
+        return serializedValue;
     }
 
     @Override
-    public Map<String, CompoundTag> getSerializedValuesToSave() {
-        return null;
-    }
-
-    @Override
-    public void deserializeAndInsertValue(CompoundTag tag) {
-
+    public void deserializeAndInsertValue(@NotNull CompoundTag tag) {
+        UUID civilizationId = tag.getUUID("Civilization");
+        ListTag claimsList = tag.getList("Claims", Tag.TAG_COMPOUND);
+        for (int j = 0; j < claimsList.size(); j++) {
+            CompoundTag chunkPosTag = claimsList.getCompound(j);
+            ChunkPos chunkPos = new ChunkPos(
+                    chunkPosTag.getInt("X"),
+                    chunkPosTag.getInt("Z")
+            );
+            this.claimsByOwner.put(civilizationId, chunkPos);
+            this.claimsByPos.put(chunkPos, civilizationId);
+        }
     }
 }

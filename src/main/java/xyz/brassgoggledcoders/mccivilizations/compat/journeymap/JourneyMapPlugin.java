@@ -9,10 +9,11 @@ import journeymap.client.api.event.FullscreenMapEvent;
 import journeymap.client.api.event.forge.PopupMenuEvent;
 import journeymap.client.api.model.IBlockInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
+import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 
@@ -41,13 +42,14 @@ public class JourneyMapPlugin implements IClientPlugin {
     }
 
     private void onPopup(PopupMenuEvent popupMenuEvent) {
-        if (lastPosition != null && lastPosition.getChunkPos() != null) {
+        Player player = Minecraft.getInstance().player;
+        if (lastPosition != null && lastPosition.getChunkPos() != null && player != null) {
             ModPopupMenu civilizationsMenu = popupMenuEvent.getPopupMenu()
                     .createSubItemList("Civilizations");
-            ILandClaimRepository claimedLand = CivilizationServices.getClaimedLand(Minecraft.getInstance().level);
+            ILandClaimRepository claimedLand = CivilizationRepositories.getLandClaimRepository();
             Civilization chunkCivilization = claimedLand.getClaimOwner(lastPosition.getChunkPos());
-            Civilization userCivilization = CivilizationServices.getCivilizationService(Minecraft.getInstance().level)
-                    .getCivilizationByCitizen(Minecraft.getInstance().player);
+            Civilization userCivilization = CivilizationRepositories.getCivilizationRepository()
+                    .getCivilizationByCitizen(player);
 
             if (userCivilization == null) {
                 civilizationsMenu.addMenuItem("Must be a Citizen of a Civilization", blockPos -> {

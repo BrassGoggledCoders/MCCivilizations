@@ -8,6 +8,7 @@ import net.minecraft.world.level.storage.LevelResource;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
+import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 public class RepositoryManager {
     public static RepositoryManager INSTANCE = null;
@@ -24,19 +25,26 @@ public class RepositoryManager {
     private final MinecraftServer minecraftServer;
 
     private final CivilizationRepository civilizationRepository;
+    private final LandClaimRepository landClaimRepository;
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
         this.civilizationRepository = new CivilizationRepository();
+        this.landClaimRepository = new LandClaimRepository(this.civilizationRepository);
     }
 
     public ICivilizationRepository getCivilizationRepository() {
         return this.civilizationRepository;
     }
 
+    public LandClaimRepository getLandClaimRepository() {
+        return landClaimRepository;
+    }
+
     private List<? extends Repository> getRepositories() {
         return List.of(
-                this.civilizationRepository
+                this.civilizationRepository,
+                this.landClaimRepository
         );
     }
 
@@ -74,19 +82,29 @@ public class RepositoryManager {
                     canSave = repositoryDirectory.mkdirs();
                 }
                 if (canSave) {
-                    for (Map.Entry<String, CompoundTag> valuesToSave : repository.getSerializedValuesToSave().entrySet()) {
-                        String fileContents = valuesToSave.getValue().toString();
-                        Path path = repositoryDirectory.toPath().resolve(valuesToSave.getKey());
-                        try {
-                            Files.writeString(
-                                    path,
-                                    fileContents,
-                                    StandardOpenOption.CREATE,
-                                    StandardOpenOption.TRUNCATE_EXISTING
-                            );
-                        } catch (IOException e) {
-                            MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), fileContents), e);
+                    for (UUID id : repository.getDirtyIds()) {
+                        CompoundTag serializedValue = repository.getSerializedValue(id);
+                        Path path = repositoryDirectory.toPath().resolve(id.toString());
+                        if (serializedValue == null) {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                MCCivilizations.LOGGER.error("Failed to delete file %s".formatted(path.toString()), e);
+                            }
+                        } else {
+                            String fileContents = serializedValue.toString();
+                            try {
+                                Files.writeString(
+                                        path,
+                                        fileContents,
+                                        StandardOpenOption.CREATE,
+                                        StandardOpenOption.TRUNCATE_EXISTING
+                                );
+                            } catch (IOException e) {
+                                MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), fileContents), e);
+                            }
                         }
+
                     }
                 }
             }

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationServices;
+import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
 @EventBusSubscriber(modid = MCCivilizations.MODID, bus = Bus.FORGE)
@@ -23,7 +23,7 @@ public class LandClaimEventHandler {
     public static void mobGriefingEvent(EntityMobGriefingEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Enemy) {
-            if (CivilizationServices.getClaimedLand(event.getEntity().getLevel()).isClaimed(entity.chunkPosition())) {
+            if (CivilizationRepositories.getLandClaimRepository().isClaimed(entity.chunkPosition())) {
                 event.setResult(Event.Result.DENY);
             }
         }
@@ -32,7 +32,7 @@ public class LandClaimEventHandler {
     @SubscribeEvent
     public static void enteringChunk(EntityEvent.EnteringSection event) {
         if (event.didChunkChange() && event.getEntity() instanceof Player player) {
-            ILandClaimRepository claimedLand = CivilizationServices.getClaimedLand(event.getEntity().getLevel());
+            ILandClaimRepository claimedLand = CivilizationRepositories.getLandClaimRepository();
             Civilization lastChunkCiv = claimedLand.getClaimOwner(event.getOldPos().chunk());
             Civilization newChunkCiv = claimedLand.getClaimOwner(event.getNewPos().chunk());
 

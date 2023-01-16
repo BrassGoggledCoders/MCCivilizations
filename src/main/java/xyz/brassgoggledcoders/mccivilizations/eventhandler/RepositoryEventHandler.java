@@ -10,7 +10,7 @@ import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 
 @EventBusSubscriber(modid = MCCivilizations.MODID, bus = Bus.FORGE)
-public class ServerEventHandler {
+public class RepositoryEventHandler {
     @SubscribeEvent
     public static void serverStarting(ServerStartedEvent event) {
         if (RepositoryManager.INSTANCE != null) {
@@ -24,7 +24,10 @@ public class ServerEventHandler {
 
     @SubscribeEvent
     public static void levelSaving(LevelEvent.Save event) {
-        RepositoryManager.INSTANCE.save();
+        if (RepositoryManager.INSTANCE != null) {
+            RepositoryManager.INSTANCE.save();
+        }
+
     }
 
     @SubscribeEvent
