@@ -31,7 +31,7 @@ public class LandClaimEventHandler {
 
     @SubscribeEvent
     public static void enteringChunk(EntityEvent.EnteringSection event) {
-        if (event.didChunkChange() && event.getEntity() instanceof Player player) {
+        if (event.didChunkChange() && event.getEntity() instanceof Player player && !player.getLevel().isClientSide()) {
             ILandClaimRepository claimedLand = CivilizationRepositories.getLandClaimRepository();
             Civilization lastChunkCiv = claimedLand.getClaimOwner(event.getOldPos().chunk());
             Civilization newChunkCiv = claimedLand.getClaimOwner(event.getNewPos().chunk());
