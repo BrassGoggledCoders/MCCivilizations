@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 

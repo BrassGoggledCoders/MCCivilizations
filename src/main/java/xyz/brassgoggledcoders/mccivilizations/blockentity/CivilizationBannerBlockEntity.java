@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
 
 import javax.annotation.Nullable;
@@ -53,6 +53,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         } else {
             this.fromItem(civilization.getBanner());
         }
+        this.setChanged();
     }
 
     public void fromItem(ItemStack pItem) {
@@ -129,14 +130,18 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
     @Override
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
-        this.civilizationUUID = pTag.getUUID("CivilizationUUID");
+        if (pTag.hasUUID("CivilizationUUID")) {
+            this.civilizationUUID = pTag.getUUID("CivilizationUUID");
+        }
         this.checkRefresh(false);
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         super.saveAdditional(pTag);
-        pTag.putUUID("CivilizationUUID", this.civilizationUUID);
+        if (this.civilizationUUID != null) {
+            pTag.putUUID("CivilizationUUID", this.civilizationUUID);
+        }
     }
 
     @Override
@@ -159,7 +164,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         if (tag.contains("Civilization")) {
-            Civilization civilization = Civilization.fromTag(tag.getCompound("Civilizations"));
+            Civilization civilization = Civilization.fromTag(tag.getCompound("Civilization"));
             this.fromItem(civilization.getBanner());
             this.name = civilization.getName();
         } else {

@@ -1,6 +1,8 @@
 package xyz.brassgoggledcoders.mccivilizations.repository;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +39,10 @@ public abstract class Repository {
 
     public String getName() {
         return this.name;
+    }
+
+    public void onPlayerJoin(ServerPlayer serverPlayer) {
+
     }
 
 }

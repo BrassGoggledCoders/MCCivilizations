@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsRecipes;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
+import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
 import java.util.function.Supplier;
 
@@ -25,6 +26,8 @@ public class MCCivilizations {
         MCCivilizationsBlocks.setup();
         MCCivilizationsRecipes.setup();
         MCCivilizationsText.setup();
+
+        NetworkHandler.setup();
     }
 
     public static ResourceLocation rl(String path) {

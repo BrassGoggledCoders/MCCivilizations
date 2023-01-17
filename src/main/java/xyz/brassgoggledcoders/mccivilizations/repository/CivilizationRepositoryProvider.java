@@ -1,19 +1,15 @@
-package xyz.brassgoggledcoders.mccivilizations.service;
+package xyz.brassgoggledcoders.mccivilizations.repository;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.service.ICivilizationRepositoryProvider;
-import xyz.brassgoggledcoders.mccivilizations.civilization.Civilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ICivilizationRepositoryProvider;
+import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
-import xyz.brassgoggledcoders.mccivilizations.claim.ClientLandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 
 public class CivilizationRepositoryProvider implements ICivilizationRepositoryProvider {
-    private final Civilizations clientCivilizations = new Civilizations();
-    private final ILandClaimRepository clientClaims = new ClientLandClaimRepository(clientCivilizations);
+    private final ICivilizationRepository clientCivilizations = new CivilizationRepository(null);
+    private final ILandClaimRepository clientClaims = new LandClaimRepository(clientCivilizations);
 
     @Override
     public ICivilizationRepository getCivilizationRepository() {

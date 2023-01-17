@@ -4,6 +4,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
@@ -30,7 +32,7 @@ public class RepositoryManager {
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
-        this.civilizationRepository = new CivilizationRepository();
+        this.civilizationRepository = new CivilizationRepository(minecraftServer);
         this.landClaimRepository = new LandClaimRepository(this.civilizationRepository);
     }
 
@@ -56,7 +58,7 @@ public class RepositoryManager {
                     .toFile();
 
             if (repositoryDirectory.exists()) {
-                File[] filesToLoad = repositoryDirectory.listFiles(file -> file.isFile() && file.getName().endsWith(".snbt"));
+                File[] filesToLoad = repositoryDirectory.listFiles(file -> file.isFile() && file.getName().endsWith(".nbt"));
                 if (filesToLoad != null) {
                     for (File file : filesToLoad) {
                         try {
@@ -85,7 +87,7 @@ public class RepositoryManager {
                 if (canSave) {
                     for (UUID id : repository.getDirtyIds()) {
                         CompoundTag serializedValue = repository.getSerializedValue(id);
-                        Path path = repositoryDirectory.toPath().resolve(id.toString());
+                        Path path = repositoryDirectory.toPath().resolve(id.toString() + ".nbt");
                         if (serializedValue == null) {
                             try {
                                 Files.delete(path);
@@ -108,6 +110,14 @@ public class RepositoryManager {
 
                     }
                 }
+            }
+        }
+    }
+
+    public void playerLoggedIn(Player entity) {
+        if (entity instanceof ServerPlayer serverPlayer) {
+            for (Repository repository : this.getRepositories()) {
+                repository.onPlayerJoin(serverPlayer);
             }
         }
     }

@@ -1,4 +1,4 @@
-package xyz.brassgoggledcoders.mccivilizations.api.service;
+package xyz.brassgoggledcoders.mccivilizations.api.repositories;
 
 import com.google.common.base.Suppliers;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;

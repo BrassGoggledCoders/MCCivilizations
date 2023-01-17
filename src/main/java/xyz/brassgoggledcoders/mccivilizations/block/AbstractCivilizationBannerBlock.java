@@ -3,7 +3,7 @@ package xyz.brassgoggledcoders.mccivilizations.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.blockentity.CivilizationBannerBlockEntity;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
@@ -50,7 +50,7 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
     @Override
     @ParametersAreNonnullByDefault
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
-        if (pPlacer instanceof Player player && pLevel.getBlockEntity(pPos) instanceof CivilizationBannerBlockEntity bannerBlockEntity) {
+        if (pPlacer instanceof ServerPlayer player && pLevel.getBlockEntity(pPos) instanceof CivilizationBannerBlockEntity bannerBlockEntity) {
             ICivilizationRepository civilizations = CivilizationRepositories.getCivilizationRepository();
             Civilization playerCivilization = civilizations.getCivilizationByCitizen(player);
             if (playerCivilization != null) {

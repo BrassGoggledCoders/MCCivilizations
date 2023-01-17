@@ -20,7 +20,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
-import xyz.brassgoggledcoders.mccivilizations.api.service.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.block.CivilizationBannerType;
 import xyz.brassgoggledcoders.mccivilizations.block.StandingCivilizationBannerBlock;
 import xyz.brassgoggledcoders.mccivilizations.render.CivilizationBannerItemStackRender;

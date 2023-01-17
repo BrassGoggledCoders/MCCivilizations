@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
+import xyz.brassgoggledcoders.mccivilizations.network.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.*;
@@ -46,8 +49,75 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByPos.put(chunkPos, civilization.getId());
             this.claimsByOwner.put(civilization.getId(), chunkPos);
             this.addDirtyId(civilization.getId());
+            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
+                civilizationRepository.updateCitizens(civilization, true);
+            }
         }
+    }
 
+    @Override
+    public void addClaims(Civilization civilization, List<ChunkPos> chunkPosList) {
+        boolean updatesNeeded = false;
+        for (ChunkPos chunkPos : chunkPosList) {
+            if (!this.claimsByPos.containsKey(chunkPos)) {
+                this.claimsByPos.put(chunkPos, civilization.getId());
+                this.claimsByOwner.put(civilization.getId(), chunkPos);
+                updatesNeeded = true;
+            }
+        }
+        if (updatesNeeded) {
+            this.addDirtyId(civilization.getId());
+            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
+                civilizationRepository.updateCitizens(civilization, true);
+            }
+        }
+    }
+
+    @Override
+    public void setClaims(UUID civilizationId, List<ChunkPos> chunkPosList) {
+        for (ChunkPos chunkPos: chunkPosList) {
+            this.claimsByPos.put(chunkPos, civilizationId);
+            this.claimsByOwner.replaceValues(civilizationId, chunkPosList);
+            this.addDirtyId(civilizationId);
+        }
+    }
+
+    @Override
+    public void removeClaim(Civilization civilization, ChunkPos chunkPos) {
+        if (this.claimsByPos.containsKey(chunkPos)) {
+            this.claimsByPos.remove(chunkPos, civilization.getId());
+            this.claimsByOwner.remove(civilization.getId(), chunkPos);
+            this.addDirtyId(civilization.getId());
+            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
+                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
+                        civilization.getId(),
+                        Collections.singletonList(chunkPos),
+                        ChangeType.DELETE
+                ));
+            }
+        }
+    }
+
+    @Override
+    public void removeClaims(Civilization civilization, List<ChunkPos> chunkPosList) {
+        List<ChunkPos> updatedChunks = new ArrayList<>();
+        for (ChunkPos chunkPos : chunkPosList) {
+            if (this.claimsByPos.containsKey(chunkPos)) {
+                this.claimsByPos.remove(chunkPos);
+                this.claimsByOwner.remove(civilization.getId(), chunkPos);
+                updatedChunks.add(chunkPos);
+            }
+        }
+        if (!updatedChunks.isEmpty()) {
+            this.addDirtyId(civilization.getId());
+            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
+                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
+                        civilization.getId(),
+                        updatedChunks,
+                        ChangeType.DELETE
+                ));
+            }
+        }
     }
 
     private Civilization getCivilization(UUID uuid) {

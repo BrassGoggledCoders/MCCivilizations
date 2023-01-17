@@ -138,7 +138,7 @@ dependencies {
 
 
     compileOnly fg.deobf(group: 'info.journeymap', name: 'journeymap-api', version: '1.19.1-1.9-SNAPSHOT', changing: true)
-    //runtimeOnly fg.deobf("curse.maven:journeymap-32274:4321645")
+    runtimeOnly fg.deobf("curse.maven:journeymap-32274:4321645")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
