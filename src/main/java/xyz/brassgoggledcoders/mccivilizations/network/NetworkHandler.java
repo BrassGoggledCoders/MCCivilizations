@@ -37,6 +37,10 @@ public class NetworkHandler {
         this.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), packet);
     }
 
+    public void sendPacketToServer(Object packet) {
+        this.simpleChannel.send(PacketDistributor.SERVER.noArg(), packet);
+    }
+
     public static NetworkHandler getInstance() {
         return INSTANCE;
     }

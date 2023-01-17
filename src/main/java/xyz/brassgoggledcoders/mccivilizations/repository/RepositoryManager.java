@@ -1,8 +1,7 @@
 package xyz.brassgoggledcoders.mccivilizations.repository;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,9 +60,11 @@ public class RepositoryManager {
                 if (filesToLoad != null) {
                     for (File file : filesToLoad) {
                         try {
-                            CompoundTag valueTag = TagParser.parseTag(Files.readString(file.toPath()));
-                            repository.deserializeAndInsertValue(valueTag);
-                        } catch (CommandSyntaxException | IOException e) {
+                            CompoundTag valueTag = NbtIo.read(file);
+                            if (valueTag != null) {
+                                repository.deserializeAndInsertValue(valueTag);
+                            }
+                        } catch (IOException e) {
                             MCCivilizations.LOGGER.error("Failed to read file %s".formatted(file.getName()), e);
                         }
                     }
@@ -95,16 +95,13 @@ public class RepositoryManager {
                                 MCCivilizations.LOGGER.error("Failed to delete file %s".formatted(path.toString()), e);
                             }
                         } else {
-                            String fileContents = serializedValue.toString();
                             try {
-                                Files.writeString(
-                                        path,
-                                        fileContents,
-                                        StandardOpenOption.CREATE,
-                                        StandardOpenOption.TRUNCATE_EXISTING
+                                NbtIo.write(
+                                        serializedValue,
+                                        path.toFile()
                                 );
                             } catch (IOException e) {
-                                MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), fileContents), e);
+                                MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), serializedValue.toString()), e);
                             }
                         }
 

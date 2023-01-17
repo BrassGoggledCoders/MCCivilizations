@@ -15,8 +15,13 @@ public class MCCivilizationsText {
             .addLang("text", MCCivilizations.rl("no_name_civilization"), "No Name");
 
     public static final Component CLAIM_CHUNK = MCCivilizations.getRegistrate()
-            .addLang("text", MCCivilizations.rl("claim_chunk"), "Claim Chunk for %s");
+            .addLang("text", MCCivilizations.rl("claim_chunk"), "Claim Chunk");
 
+    public static final Component UNCLAIM_CHUNK = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("unclaim_chunk"), "Unclaim Chunk");
+
+    public static final Component CITIZENSHIP_REQUIRED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("citizenship_required"), "You must be a citizen of a Civilization");
 
     public static void setup() {
 

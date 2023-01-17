@@ -50,25 +50,33 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByOwner.put(civilization.getId(), chunkPos);
             this.addDirtyId(civilization.getId());
             if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, true);
+                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
+                        civilization.getId(),
+                        Collections.singletonList(chunkPos),
+                        ChangeType.ADD
+                ));
             }
         }
     }
 
     @Override
     public void addClaims(Civilization civilization, List<ChunkPos> chunkPosList) {
-        boolean updatesNeeded = false;
+        List<ChunkPos> updatedPos = new ArrayList<>();
         for (ChunkPos chunkPos : chunkPosList) {
             if (!this.claimsByPos.containsKey(chunkPos)) {
                 this.claimsByPos.put(chunkPos, civilization.getId());
                 this.claimsByOwner.put(civilization.getId(), chunkPos);
-                updatesNeeded = true;
+                updatedPos.add(chunkPos);
             }
         }
-        if (updatesNeeded) {
+        if (!updatedPos.isEmpty()) {
             this.addDirtyId(civilization.getId());
             if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, true);
+                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
+                        civilization.getId(),
+                        updatedPos,
+                        ChangeType.ADD
+                ));
             }
         }
     }
@@ -135,9 +143,8 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             chunkNBT.putInt("Z", chunkPos.z);
             listTag.add(chunkNBT);
         }
-        CompoundTag claimTag = new CompoundTag();
-        claimTag.putUUID("Civilization", id);
-        claimTag.put("Claims", listTag);
+        serializedValue.putUUID("Civilization", id);
+        serializedValue.put("Claims", listTag);
         return serializedValue;
     }
 

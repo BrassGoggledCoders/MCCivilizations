@@ -10,13 +10,19 @@ import journeymap.client.api.event.forge.PopupMenuEvent;
 import journeymap.client.api.model.IBlockInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
-import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
+import xyz.brassgoggledcoders.mccivilizations.network.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
+import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
+import java.util.Collections;
 import java.util.EnumSet;
 
 @ClientPlugin
@@ -52,23 +58,24 @@ public class JourneyMapPlugin implements IClientPlugin {
                     .getCivilizationByCitizen(player);
 
             if (userCivilization == null) {
-                civilizationsMenu.addMenuItem("Must be a Citizen of a Civilization", blockPos -> {
+                civilizationsMenu.addMenuItem(MCCivilizationsText.CITIZENSHIP_REQUIRED.getString(), blockPos -> {
 
                 });
             } else if (chunkCivilization == null) {
-                civilizationsMenu.addMenuItem("Claim Chunk For ".formatted(), blockPos -> {
-
-                });
+                civilizationsMenu.addMenuItem(MCCivilizationsText.CLAIM_CHUNK.getString(), blockPos ->
+                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
+                                userCivilization.getId(),
+                                Collections.singletonList(new ChunkPos(blockPos)),
+                                ChangeType.ADD
+                        )));
             } else if (chunkCivilization.equals(userCivilization)) {
-                civilizationsMenu.addMenuItem("Un-claim Chunk", blockPos -> {
-
-                });
-            } else {
-                civilizationsMenu.addMenuItem("Can't interact with other Civilizations", blockPos -> {
-
-                });
+                civilizationsMenu.addMenuItem(MCCivilizationsText.UNCLAIM_CHUNK.getString(), blockPos ->
+                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
+                                userCivilization.getId(),
+                                Collections.singletonList(new ChunkPos(blockPos)),
+                                ChangeType.DELETE
+                        )));
             }
-
         }
     }
 
