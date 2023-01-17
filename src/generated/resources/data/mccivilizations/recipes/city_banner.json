@@ -1,0 +1,9 @@
+{
+  "type": "mccivilizations:transfer_banner_pattern",
+  "ingredient": {
+    "tag": "forge:ingots/iron"
+  },
+  "result": {
+    "item": "mccivilizations:city_banner"
+  }
+}

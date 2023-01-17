@@ -1,3 +1,22 @@
-// 1.19.2	2023-01-14T20:07:52.736153	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-9fea6d07036eb0a87d67c952404c77e58e79f694 assets/mccivilizations/lang/en_ud.json
-42c3d186a0c26cb943a61362803bedd2f94d7d62 assets/mccivilizations/lang/en_us.json
+// 1.19.2	2023-01-16T18:51:26.3458363	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_hanging_banner.json
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_standing_banner.json
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/city_hanging_banner.json
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/city_standing_banner.json
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/decor_hanging_banner.json
+07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/decor_standing_banner.json
+36163bd2277e9dbe1a7529e6bc8c608118d40ea9 assets/mccivilizations/lang/en_ud.json
+be390f43316cf1ddd02c900bab2b3ff9cc7566f6 assets/mccivilizations/lang/en_us.json
+509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/capital_banner.json
+509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/city_banner.json
+509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/decor_banner.json
+2ec5f5d7d1d5b2056a45aff420b81ba02af645f3 data/mccivilizations/loot_tables/blocks/capital_hanging_banner.json
+2ec5f5d7d1d5b2056a45aff420b81ba02af645f3 data/mccivilizations/loot_tables/blocks/capital_standing_banner.json
+cf0d6ef239aafb6c326e7d15413f20385b43630a data/mccivilizations/loot_tables/blocks/city_hanging_banner.json
+cf0d6ef239aafb6c326e7d15413f20385b43630a data/mccivilizations/loot_tables/blocks/city_standing_banner.json
+9fd51d13b0df9d97c963d747fc0f5af67ab055d5 data/mccivilizations/loot_tables/blocks/decor_hanging_banner.json
+9fd51d13b0df9d97c963d747fc0f5af67ab055d5 data/mccivilizations/loot_tables/blocks/decor_standing_banner.json
+679249cbb7f087546d02ac6add4380a0facf161c data/mccivilizations/recipes/capital_banner.json
+79fa8e02039911e353105ac536a36b3609657a47 data/mccivilizations/recipes/city_banner.json
+d480fb8b40d4e323c65f00c81f5381e3c8effb2a data/mccivilizations/recipes/decor_banner.json
+8b498182d94b88ac4846b3204d4b098975a7f15e data/mccivilizations/tags/items/no_cost_naming.json

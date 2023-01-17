@@ -1,4 +1,7 @@
 {
+  "block.mccivilizations.capital_standing_banner": "Capital Banner",
+  "block.mccivilizations.city_standing_banner": "City Banner",
+  "block.mccivilizations.decor_standing_banner": "Decorative Banner",
   "text.mccivilizations.claim_chunk": "Claim Chunk for %s",
   "text.mccivilizations.entering_civilization": "Entering %s",
   "text.mccivilizations.leaving_civilization": "Leaving %s",
