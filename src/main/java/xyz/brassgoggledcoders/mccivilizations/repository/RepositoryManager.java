@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
 
@@ -21,7 +22,7 @@ import java.util.UUID;
 public class RepositoryManager {
     public static RepositoryManager INSTANCE = null;
 
-    private static final LevelResource REPOSITORY_FOLDER = new LevelResource("mccivilizations");
+    private static final LevelResource REPOSITORY_FOLDER = new LevelResource("data/mccivilizations");
     private final MinecraftServer minecraftServer;
 
     private final CivilizationRepository civilizationRepository;
@@ -37,7 +38,7 @@ public class RepositoryManager {
         return this.civilizationRepository;
     }
 
-    public LandClaimRepository getLandClaimRepository() {
+    public ILandClaimRepository getLandClaimRepository() {
         return landClaimRepository;
     }
 

@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class MCCivilizationsBlocks {
-
 
     public static final Map<CivilizationBannerType, BlockEntry<StandingCivilizationBannerBlock>> STANDING_BANNERS =
             Util.make(

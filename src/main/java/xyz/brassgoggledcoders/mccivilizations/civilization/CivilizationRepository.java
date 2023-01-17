@@ -51,6 +51,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     public void joinCivilization(Civilization civilization, Entity player) {
         if (this.civilizationsById.containsKey(civilization.getId())) {
             this.civilizationsByCitizen.put(player.getUUID(), civilization.getId());
+            this.civilizationCitizens.put(civilization.getId(), player.getUUID());
             this.addDirtyId(civilization.getId());
         }
     }

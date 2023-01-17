@@ -79,7 +79,7 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
     public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         super.randomTick(pState, pLevel, pPos, pRandom);
         if (pLevel.getBlockEntity(pPos) instanceof CivilizationBannerBlockEntity bannerBlockEntity) {
-            bannerBlockEntity.checkRefresh();
+            bannerBlockEntity.checkRefresh(true);
         }
     }
 }

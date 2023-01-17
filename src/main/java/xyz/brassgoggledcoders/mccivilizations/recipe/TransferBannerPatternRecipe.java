@@ -11,6 +11,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsRecipes;
 
 public record TransferBannerPatternRecipe(
@@ -67,7 +68,11 @@ public record TransferBannerPatternRecipe(
         }
 
         if (bannerPattern != null) {
-            assembledResult.setTag(bannerPattern);
+            BlockItem.setBlockEntityData(
+                    assembledResult,
+                    MCCivilizationsBlocks.CIVILIZATION_BANNER_BLOCK_ENTITY.get(),
+                    bannerPattern
+            );
         }
         return assembledResult;
     }
