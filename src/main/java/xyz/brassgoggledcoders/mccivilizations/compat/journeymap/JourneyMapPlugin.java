@@ -67,14 +67,16 @@ public class JourneyMapPlugin implements IClientPlugin {
                                 userCivilization.getId(),
                                 Collections.singletonList(new ChunkPos(blockPos)),
                                 ChangeType.ADD
-                        )));
+                        ))
+                );
             } else if (chunkCivilization.equals(userCivilization)) {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.UNCLAIM_CHUNK.getString(), blockPos ->
                         NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
                                 userCivilization.getId(),
                                 Collections.singletonList(new ChunkPos(blockPos)),
                                 ChangeType.DELETE
-                        )));
+                        ))
+                );
             }
         }
     }

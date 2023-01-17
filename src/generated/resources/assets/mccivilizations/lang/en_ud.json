@@ -2,8 +2,10 @@
   "block.mccivilizations.capital_standing_banner": "ɹǝuuɐᗺ ןɐʇıdɐƆ",
   "block.mccivilizations.city_standing_banner": "ɹǝuuɐᗺ ʎʇıƆ",
   "block.mccivilizations.decor_standing_banner": "ɹǝuuɐᗺ ǝʌıʇɐɹoɔǝᗡ",
-  "text.mccivilizations.claim_chunk": "%s ɹoɟ ʞunɥƆ ɯıɐןƆ",
+  "text.mccivilizations.citizenship_required": "uoıʇɐzıןıʌıƆ ɐ ɟo uǝzıʇıɔ ɐ ǝq ʇsnɯ noʎ",
+  "text.mccivilizations.claim_chunk": "ʞunɥƆ ɯıɐןƆ",
   "text.mccivilizations.entering_civilization": "%s buıɹǝʇuƎ",
   "text.mccivilizations.leaving_civilization": "%s buıʌɐǝꞀ",
-  "text.mccivilizations.no_name_civilization": "ǝɯɐN oN"
+  "text.mccivilizations.no_name_civilization": "ǝɯɐN oN",
+  "text.mccivilizations.unclaim_chunk": "ʞunɥƆ ɯıɐןɔu∩"
 }

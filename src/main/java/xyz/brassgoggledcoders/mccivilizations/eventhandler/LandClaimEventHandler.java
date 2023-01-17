@@ -1,6 +1,5 @@
 package xyz.brassgoggledcoders.mccivilizations.eventhandler;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -37,10 +36,11 @@ public class LandClaimEventHandler {
             Civilization newChunkCiv = claimedLand.getClaimOwner(event.getNewPos().chunk());
 
             if (lastChunkCiv != newChunkCiv) {
+                if (lastChunkCiv != null) {
+                    player.sendSystemMessage(MCCivilizationsText.translate(MCCivilizationsText.LEAVING_CIVILIZATION, lastChunkCiv.getName()));
+                }
                 if (newChunkCiv != null) {
-                    player.sendSystemMessage(Component.translatable(MCCivilizationsText.ENTERING_CIVILIZATION.getString(), newChunkCiv.getName()));
-                } else {
-                    player.sendSystemMessage(Component.translatable(MCCivilizationsText.LEAVING_CIVILIZATION.getString(), lastChunkCiv.getName()));
+                    player.sendSystemMessage(MCCivilizationsText.translate(MCCivilizationsText.ENTERING_CIVILIZATION, newChunkCiv.getName()));
                 }
             }
         }

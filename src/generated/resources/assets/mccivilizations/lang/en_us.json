@@ -2,8 +2,10 @@
   "block.mccivilizations.capital_standing_banner": "Capital Banner",
   "block.mccivilizations.city_standing_banner": "City Banner",
   "block.mccivilizations.decor_standing_banner": "Decorative Banner",
-  "text.mccivilizations.claim_chunk": "Claim Chunk for %s",
+  "text.mccivilizations.citizenship_required": "You must be a citizen of a Civilization",
+  "text.mccivilizations.claim_chunk": "Claim Chunk",
   "text.mccivilizations.entering_civilization": "Entering %s",
   "text.mccivilizations.leaving_civilization": "Leaving %s",
-  "text.mccivilizations.no_name_civilization": "No Name"
+  "text.mccivilizations.no_name_civilization": "No Name",
+  "text.mccivilizations.unclaim_chunk": "Unclaim Chunk"
 }

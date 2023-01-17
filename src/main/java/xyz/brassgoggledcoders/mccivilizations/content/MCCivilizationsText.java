@@ -1,6 +1,7 @@
 package xyz.brassgoggledcoders.mccivilizations.content;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 
 public class MCCivilizationsText {
@@ -22,6 +23,14 @@ public class MCCivilizationsText {
 
     public static final Component CITIZENSHIP_REQUIRED = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("citizenship_required"), "You must be a citizen of a Civilization");
+
+    public static Component translate(Component component, Object... args) {
+        if (component.getContents() instanceof TranslatableContents translatableContents) {
+            return Component.translatable(translatableContents.getKey(), args);
+        } else {
+            return component;
+        }
+    }
 
     public static void setup() {
 
