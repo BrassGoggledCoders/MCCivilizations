@@ -21,4 +21,6 @@ public interface ICivilizationRepository {
     void joinCivilization(Civilization civilization, Entity player);
 
     void removeCivilization(Civilization civilization);
+
+    Collection<Civilization> getAllCivilizations();
 }

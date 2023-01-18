@@ -11,13 +11,13 @@ import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepo
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public record LandClaimUpdatePacket(
         UUID civilizationId,
-        List<ChunkPos> positions,
+        Collection<ChunkPos> positions,
         ChangeType changeType
 ) {
 

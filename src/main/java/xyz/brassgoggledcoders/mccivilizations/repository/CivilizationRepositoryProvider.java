@@ -5,10 +5,9 @@ import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ICivilizationRepositoryProvider;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
-import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 
 public class CivilizationRepositoryProvider implements ICivilizationRepositoryProvider {
-    private final ICivilizationRepository clientCivilizations = new CivilizationRepository(null);
+    private final ICivilizationRepository clientCivilizations = new CivilizationRepository();
     private final ILandClaimRepository clientClaims = new LandClaimRepository(clientCivilizations);
 
     @Override

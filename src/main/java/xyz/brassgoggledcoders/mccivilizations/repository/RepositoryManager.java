@@ -30,7 +30,7 @@ public class RepositoryManager {
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
-        this.civilizationRepository = new CivilizationRepository(minecraftServer);
+        this.civilizationRepository = new CivilizationRepository();
         this.landClaimRepository = new LandClaimRepository(this.civilizationRepository);
     }
 

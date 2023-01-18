@@ -25,11 +25,8 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     private final Multimap<UUID, UUID> civilizationCitizens;
     private final Map<UUID, UUID> civilizationsByCitizen;
 
-    private final MinecraftServer server;
-
-    public CivilizationRepository(MinecraftServer server) {
+    public CivilizationRepository() {
         super("civilizations");
-        this.server = server;
         this.civilizationsById = new HashMap<>();
         this.civilizationsByCitizen = new HashMap<>();
         this.civilizationCitizens = HashMultimap.create();
@@ -37,7 +34,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
 
     @Override
     @Nullable
-    public Civilization getCivilizationByCitizen(Entity entity) {
+    public Civilization getCivilizationByCitizen(@NotNull Entity entity) {
         return Optional.ofNullable(this.civilizationsByCitizen.get(entity.getUUID()))
                 .map(this.civilizationsById::get)
                 .orElse(null);
@@ -58,7 +55,8 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     public void upsertCivilization(Civilization civilization) {
         this.civilizationsById.put(civilization.getId(), civilization);
         this.addDirtyId(civilization.getId());
-        updateCitizens(civilization, new CivilizationUpdatePacket(civilization, ChangeType.ADD));
+        NetworkHandler.getInstance()
+                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD));
     }
 
     @Override
@@ -78,7 +76,13 @@ public class CivilizationRepository extends Repository implements ICivilizationR
             this.civilizationsByCitizen.remove(uuid);
         }
         this.addDirtyId(civilization.getId());
-        updateCitizens(civilization, new CivilizationUpdatePacket(civilization, ChangeType.DELETE));
+        NetworkHandler.getInstance()
+                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.DELETE));
+    }
+
+    @Override
+    public Collection<Civilization> getAllCivilizations() {
+        return this.civilizationsById.values();
     }
 
     @Override
@@ -111,26 +115,12 @@ public class CivilizationRepository extends Repository implements ICivilizationR
         }
     }
 
-    public void updateCitizens(Civilization civilization, Object packet) {
-        if (this.server != null) {
-            for (UUID citizen : this.getCitizens(civilization)) {
-                ServerPlayer serverPlayer = this.server.getPlayerList()
-                        .getPlayer(citizen);
-
-                if (serverPlayer != null) {
-                    NetworkHandler.getInstance()
-                            .sendPacket(serverPlayer, packet);
-                }
-            }
-        }
-    }
-
     @Override
     public void onPlayerJoin(ServerPlayer serverPlayer) {
         Civilization civilization = this.getCivilizationByCitizen(serverPlayer);
         if (civilization != null) {
             NetworkHandler.getInstance()
-                    .sendPacket(serverPlayer, new CivilizationUpdatePacket(civilization, ChangeType.ADD));
+                    .sendPacket(serverPlayer, new CivilizationUpdatePacket(this.getAllCivilizations(), ChangeType.ADD));
         }
     }
 }

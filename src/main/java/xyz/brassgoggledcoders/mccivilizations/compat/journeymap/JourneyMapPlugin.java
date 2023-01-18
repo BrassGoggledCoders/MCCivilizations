@@ -31,7 +31,8 @@ public class JourneyMapPlugin implements IClientPlugin {
 
     @Override
     public void initialize(@NotNull IClientAPI clientAPI) {
-        clientAPI.subscribe(this.getModId(), EnumSet.of(ClientEvent.Type.MAP_MOUSE_MOVED));
+        clientAPI.subscribe(this.getModId(), EnumSet.of(ClientEvent.Type.MAP_MOUSE_MOVED, ClientEvent.Type.MAPPING_STARTED,
+                ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.DISPLAY_UPDATE));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
     }
 

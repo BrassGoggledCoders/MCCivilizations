@@ -1,5 +1,6 @@
 package xyz.brassgoggledcoders.mccivilizations.network;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -35,6 +36,10 @@ public class NetworkHandler {
 
     public void sendPacket(ServerPlayer serverPlayer, Object packet) {
         this.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), packet);
+    }
+
+    public void sendPacketToAll(Object packet) {
+        this.simpleChannel.send(PacketDistributor.ALL.noArg(), packet);
     }
 
     public void sendPacketToServer(Object packet) {

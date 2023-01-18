@@ -5,15 +5,16 @@ import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
-import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.network.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
+import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.*;
@@ -49,18 +50,17 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByPos.put(chunkPos, civilization.getId());
             this.claimsByOwner.put(civilization.getId(), chunkPos);
             this.addDirtyId(civilization.getId());
-            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
-                        civilization.getId(),
-                        Collections.singletonList(chunkPos),
-                        ChangeType.ADD
-                ));
-            }
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new LandClaimUpdatePacket(
+                            civilization.getId(),
+                            Collections.singletonList(chunkPos),
+                            ChangeType.ADD
+                    ));
         }
     }
 
     @Override
-    public void addClaims(Civilization civilization, List<ChunkPos> chunkPosList) {
+    public void addClaims(Civilization civilization, Collection<ChunkPos> chunkPosList) {
         List<ChunkPos> updatedPos = new ArrayList<>();
         for (ChunkPos chunkPos : chunkPosList) {
             if (!this.claimsByPos.containsKey(chunkPos)) {
@@ -71,19 +71,18 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         }
         if (!updatedPos.isEmpty()) {
             this.addDirtyId(civilization.getId());
-            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
-                        civilization.getId(),
-                        updatedPos,
-                        ChangeType.ADD
-                ));
-            }
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new LandClaimUpdatePacket(
+                            civilization.getId(),
+                            updatedPos,
+                            ChangeType.ADD
+                    ));
         }
     }
 
     @Override
-    public void setClaims(UUID civilizationId, List<ChunkPos> chunkPosList) {
-        for (ChunkPos chunkPos: chunkPosList) {
+    public void setClaims(UUID civilizationId, Collection<ChunkPos> chunkPosList) {
+        for (ChunkPos chunkPos : chunkPosList) {
             this.claimsByPos.put(chunkPos, civilizationId);
             this.claimsByOwner.replaceValues(civilizationId, chunkPosList);
             this.addDirtyId(civilizationId);
@@ -96,18 +95,17 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByPos.remove(chunkPos, civilization.getId());
             this.claimsByOwner.remove(civilization.getId(), chunkPos);
             this.addDirtyId(civilization.getId());
-            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
-                        civilization.getId(),
-                        Collections.singletonList(chunkPos),
-                        ChangeType.DELETE
-                ));
-            }
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new LandClaimUpdatePacket(
+                            civilization.getId(),
+                            Collections.singletonList(chunkPos),
+                            ChangeType.DELETE
+                    ));
         }
     }
 
     @Override
-    public void removeClaims(Civilization civilization, List<ChunkPos> chunkPosList) {
+    public void removeClaims(Civilization civilization, Collection<ChunkPos> chunkPosList) {
         List<ChunkPos> updatedChunks = new ArrayList<>();
         for (ChunkPos chunkPos : chunkPosList) {
             if (this.claimsByPos.containsKey(chunkPos)) {
@@ -118,13 +116,12 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         }
         if (!updatedChunks.isEmpty()) {
             this.addDirtyId(civilization.getId());
-            if (this.civilizations instanceof CivilizationRepository civilizationRepository) {
-                civilizationRepository.updateCitizens(civilization, new LandClaimUpdatePacket(
-                        civilization.getId(),
-                        updatedChunks,
-                        ChangeType.DELETE
-                ));
-            }
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new LandClaimUpdatePacket(
+                            civilization.getId(),
+                            updatedChunks,
+                            ChangeType.DELETE
+                    ));
         }
     }
 
@@ -161,5 +158,19 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByOwner.put(civilizationId, chunkPos);
             this.claimsByPos.put(chunkPos, civilizationId);
         }
+    }
+
+    @Override
+    public void onPlayerJoin(ServerPlayer serverPlayer) {
+        for (Map.Entry<UUID, Collection<ChunkPos>> entry : this.claimsByOwner.asMap().entrySet())
+            NetworkHandler.getInstance()
+                    .sendPacket(
+                            serverPlayer,
+                            new LandClaimUpdatePacket(
+                                    entry.getKey(),
+                                    entry.getValue(),
+                                    ChangeType.ADD
+                            )
+                    );
     }
 }
