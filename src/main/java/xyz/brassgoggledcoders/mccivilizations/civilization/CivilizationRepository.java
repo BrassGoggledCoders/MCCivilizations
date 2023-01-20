@@ -24,8 +24,11 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     private final Multimap<UUID, UUID> civilizationCitizens;
     private final Map<UUID, UUID> civilizationsByCitizen;
 
-    public CivilizationRepository() {
+    private final boolean sync;
+
+    public CivilizationRepository(boolean sync) {
         super("civilizations");
+        this.sync = sync;
         this.civilizationsById = new HashMap<>();
         this.civilizationsByCitizen = new HashMap<>();
         this.civilizationCitizens = HashMultimap.create();
@@ -54,27 +57,34 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     public void upsertCivilization(Civilization civilization) {
         this.civilizationsById.put(civilization.getId(), civilization);
         this.addDirtyId(civilization.getId());
-        NetworkHandler.getInstance()
-                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD));
+        if (sync) {
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD, 11));
+        }
+
     }
 
     @Override
-    public void joinCivilization(Civilization civilization, Entity player) {
+    public boolean joinCivilization(Civilization civilization, Entity player) {
         if (this.civilizationsById.containsKey(civilization.getId())) {
             this.civilizationsByCitizen.put(player.getUUID(), civilization.getId());
             this.civilizationCitizens.put(civilization.getId(), player.getUUID());
             this.addDirtyId(civilization.getId());
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void leaveCivilization(Civilization civilization, Entity citizen) {
+    public boolean leaveCivilization(Civilization civilization, Entity citizen) {
         if (this.civilizationsById.containsKey(civilization.getId())) {
             if (this.civilizationCitizens.remove(civilization.getId(), citizen.getUUID())) {
                 this.civilizationsByCitizen.remove(citizen.getUUID());
                 this.addDirtyId(civilization.getId());
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -85,8 +95,10 @@ public class CivilizationRepository extends Repository implements ICivilizationR
             this.civilizationsByCitizen.remove(uuid);
         }
         this.addDirtyId(civilization.getId());
-        NetworkHandler.getInstance()
-                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.REMOVE));
+        if (sync) {
+            NetworkHandler.getInstance()
+                    .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.REMOVE, 11));
+        }
     }
 
     @Override
@@ -129,7 +141,9 @@ public class CivilizationRepository extends Repository implements ICivilizationR
         Civilization civilization = this.getCivilizationByCitizen(serverPlayer);
         if (civilization != null) {
             NetworkHandler.getInstance()
-                    .sendPacket(serverPlayer, new CivilizationUpdatePacket(this.getAllCivilizations(), ChangeType.ADD));
+                    .sendPacket(serverPlayer, new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD, 1));
         }
+        NetworkHandler.getInstance()
+                .sendPacket(serverPlayer, new CivilizationUpdatePacket(this.getAllCivilizations(), ChangeType.ADD, 11));
     }
 }

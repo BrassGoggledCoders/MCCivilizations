@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,8 +31,8 @@ public class RepositoryManager {
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
-        this.civilizationRepository = new CivilizationRepository();
-        this.landClaimRepository = new LandClaimRepository(this.civilizationRepository);
+        this.civilizationRepository = new CivilizationRepository(true);
+        this.landClaimRepository = new LandClaimRepository(this.civilizationRepository, true);
     }
 
     public ICivilizationRepository getCivilizationRepository() {
@@ -85,7 +86,8 @@ public class RepositoryManager {
                     canSave = repositoryDirectory.mkdirs();
                 }
                 if (canSave) {
-                    for (UUID id : repository.getDirtyIds()) {
+                    List<UUID> dirtyIds = new ArrayList<>(repository.getDirtyIds());
+                    for (UUID id : dirtyIds) {
                         CompoundTag serializedValue = repository.getSerializedValue(id);
                         Path path = repositoryDirectory.toPath().resolve(id.toString() + ".nbt");
                         if (serializedValue == null) {

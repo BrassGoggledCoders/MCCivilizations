@@ -24,15 +24,18 @@ import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class LandClaimRepository extends Repository implements ILandClaimRepository {
     private final Table<ResourceKey<Level>, ChunkPos, UUID> claimsByPos;
     private final Table<UUID, ResourceKey<Level>, Collection<ChunkPos>> claimsByOwner;
     private final ICivilizationRepository civilizations;
+    private final boolean sync;
 
-    public LandClaimRepository(ICivilizationRepository civilizations) {
+    public LandClaimRepository(ICivilizationRepository civilizations, boolean sync) {
         super("land_claims");
         this.civilizations = civilizations;
+        this.sync = sync;
         this.claimsByPos = HashBasedTable.create();
         this.claimsByOwner = HashBasedTable.create();
     }
@@ -57,12 +60,15 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             addChunkToOwner(civilization, level, chunkPos);
             this.addDirtyId(civilization.getId());
             MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, Collections.singletonList(chunkPos), ChangeType.ADD));
-            NetworkHandler.getInstance()
-                    .sendPacketToAll(new LandClaimUpdatePacket(
-                            civilization.getId(),
-                            Map.of(level, Collections.singletonList(chunkPos)),
-                            ChangeType.ADD
-                    ));
+            if (sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new LandClaimUpdatePacket(
+                                civilization.getId(),
+                                Map.of(level, Collections.singletonList(chunkPos)),
+                                ChangeType.ADD,
+                                15
+                        ));
+            }
         }
     }
 
@@ -79,12 +85,15 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         if (!updatedPos.isEmpty()) {
             this.addDirtyId(civilization.getId());
             MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, updatedPos, ChangeType.ADD));
-            NetworkHandler.getInstance()
-                    .sendPacketToAll(new LandClaimUpdatePacket(
-                            civilization.getId(),
-                            Map.of(level, updatedPos),
-                            ChangeType.ADD
-                    ));
+            if (sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new LandClaimUpdatePacket(
+                                civilization.getId(),
+                                Map.of(level, updatedPos),
+                                ChangeType.ADD,
+                                15
+                        ));
+            }
         }
     }
 
@@ -109,12 +118,16 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             Optional.ofNullable(this.claimsByOwner.get(civilization.getId(), level))
                     .ifPresent(chunkPosClaim -> chunkPosClaim.remove(chunkPos));
             this.addDirtyId(civilization.getId());
-            NetworkHandler.getInstance()
-                    .sendPacketToAll(new LandClaimUpdatePacket(
-                            civilization.getId(),
-                            Map.of(level, Collections.singletonList(chunkPos)),
-                            ChangeType.REMOVE
-                    ));
+            MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, Collections.singleton(chunkPos), ChangeType.REMOVE));
+            if (sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new LandClaimUpdatePacket(
+                                civilization.getId(),
+                                Map.of(level, Collections.singletonList(chunkPos)),
+                                ChangeType.REMOVE,
+                                14
+                        ));
+            }
         }
     }
 
@@ -132,22 +145,25 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         if (!updatedChunks.isEmpty()) {
             this.addDirtyId(civilization.getId());
             MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, updatedChunks, ChangeType.REMOVE));
-            NetworkHandler.getInstance()
-                    .sendPacketToAll(new LandClaimUpdatePacket(
-                            civilization.getId(),
-                            Map.of(level, updatedChunks),
-                            ChangeType.REMOVE
-                    ));
+            if (sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new LandClaimUpdatePacket(
+                                civilization.getId(),
+                                Map.of(level, updatedChunks),
+                                ChangeType.REMOVE,
+                                14
+                        ));
+            }
         }
     }
 
     @Override
     public void transferClaims(Civilization fromCivilization, Civilization toCivilization) {
         Map<ResourceKey<Level>, Collection<ChunkPos>> fromClaims = this.claimsByOwner.row(fromCivilization.getId());
-        for (Map.Entry<ResourceKey<Level>, Collection<ChunkPos>> entry : fromClaims.entrySet()) {
+        for (Entry<ResourceKey<Level>, Collection<ChunkPos>> entry : fromClaims.entrySet()) {
+            this.removeClaims(fromCivilization, entry.getKey(), entry.getValue());
             this.addClaims(toCivilization, entry.getKey(), entry.getValue());
         }
-        fromClaims.clear();
     }
 
     private Civilization getCivilization(UUID uuid) {
@@ -159,7 +175,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
     public CompoundTag getSerializedValue(UUID id) {
         CompoundTag serializedValue = new CompoundTag();
         ListTag claimsTag = new ListTag();
-        for (Map.Entry<ResourceKey<Level>, Collection<ChunkPos>> ownerClaims : this.claimsByOwner.row(id).entrySet()) {
+        for (Entry<ResourceKey<Level>, Collection<ChunkPos>> ownerClaims : this.claimsByOwner.row(id).entrySet()) {
             CompoundTag levelTag = new CompoundTag();
             ListTag chunkListTag = new ListTag();
             for (ChunkPos chunkPos : ownerClaims.getValue()) {
@@ -204,17 +220,35 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
 
     @Override
     public void onPlayerJoin(ServerPlayer serverPlayer) {
-        /* TODO Fix syncing
-        for (Map.Entry<UUID, Collection<ChunkPos>> entry : this.claimsByOwner.asMap().entrySet())
+        Civilization playerCivilization = this.civilizations.getCivilizationByCitizen(serverPlayer);
+
+        if (playerCivilization != null) {
+            Map<ResourceKey<Level>, Collection<ChunkPos>> chunkPosMap = this.claimsByOwner.row(playerCivilization.getId());
+            NetworkHandler.getInstance()
+                    .sendPacket(
+                            serverPlayer,
+                            new LandClaimUpdatePacket(
+                                    playerCivilization.getId(),
+                                    chunkPosMap,
+                                    ChangeType.ADD,
+                                    5
+                            )
+                    );
+        }
+
+
+        for (Entry<UUID, Map<ResourceKey<Level>, Collection<ChunkPos>>> entry : this.claimsByOwner.rowMap().entrySet()) {
             NetworkHandler.getInstance()
                     .sendPacket(
                             serverPlayer,
                             new LandClaimUpdatePacket(
                                     entry.getKey(),
                                     entry.getValue(),
-                                    ChangeType.ADD
+                                    ChangeType.ADD,
+                                    13
                             )
                     );
-         */
+        }
+
     }
 }

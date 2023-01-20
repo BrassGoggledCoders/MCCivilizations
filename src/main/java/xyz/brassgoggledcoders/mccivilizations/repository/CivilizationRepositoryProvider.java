@@ -7,8 +7,8 @@ import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepositor
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
 
 public class CivilizationRepositoryProvider implements ICivilizationRepositoryProvider {
-    private final ICivilizationRepository clientCivilizations = new CivilizationRepository();
-    private final ILandClaimRepository clientClaims = new LandClaimRepository(clientCivilizations);
+    private final ICivilizationRepository clientCivilizations = new CivilizationRepository(false);
+    private final ILandClaimRepository clientClaims = new LandClaimRepository(clientCivilizations, false);
 
     @Override
     public ICivilizationRepository getCivilizationRepository() {

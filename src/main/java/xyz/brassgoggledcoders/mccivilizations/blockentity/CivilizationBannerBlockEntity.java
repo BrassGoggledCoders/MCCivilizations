@@ -229,4 +229,8 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
 
         return InteractionResult.PASS;
     }
+
+    public DyeColor getDyeColor() {
+        return this.dyeColor;
+    }
 }

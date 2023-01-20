@@ -29,12 +29,9 @@ import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimClaimPacket;
-import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Map;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
@@ -47,7 +44,7 @@ public class JourneyMapPlugin implements IClientPlugin {
     public void initialize(@NotNull IClientAPI clientAPI) {
         this.clientAPI = clientAPI;
         clientAPI.subscribe(this.getModId(), EnumSet.of(ClientEvent.Type.MAP_MOUSE_MOVED, ClientEvent.Type.MAPPING_STARTED,
-                ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.DISPLAY_UPDATE));
+                ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.MAP_CLICKED));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
         MinecraftForge.EVENT_BUS.addListener(this::onClaimChange);
     }
@@ -132,8 +129,8 @@ public class JourneyMapPlugin implements IClientPlugin {
                                         .setStrokeOpacity(0.15F),
                                 PolygonHelper.createChunkPolygon(
                                         chunkPos.x,
-                                        chunkPos.z,
-                                        64
+                                        0,
+                                        chunkPos.z
                                 )
                         )
                 );

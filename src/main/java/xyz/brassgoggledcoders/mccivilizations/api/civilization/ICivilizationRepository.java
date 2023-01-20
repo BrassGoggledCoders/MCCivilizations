@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface ICivilizationRepository {
     @Nullable
     Civilization getCivilizationByCitizen(@NotNull Entity entity);

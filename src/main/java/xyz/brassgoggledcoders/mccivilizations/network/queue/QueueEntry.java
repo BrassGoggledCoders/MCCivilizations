@@ -14,7 +14,7 @@ public class QueueEntry<T> implements Comparable<QueueEntry<?>> {
     private final long startedTick;
     private final CountDownLatch attempts;
 
-    public QueueEntry(T value, Predicate<T> isReady, Consumer<T> handle, int priority, int startedTick) {
+    public QueueEntry(T value, Predicate<T> isReady, Consumer<T> handle, int priority, long startedTick) {
         this.value = value;
         this.isReady = isReady;
         this.handle = handle;
