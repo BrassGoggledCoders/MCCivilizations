@@ -32,6 +32,12 @@ public class NetworkHandler {
                 .encoder(LandClaimUpdatePacket::encode)
                 .consumerMainThread(LandClaimUpdatePacket::consume)
                 .add();
+
+        this.simpleChannel.messageBuilder(LandClaimClaimPacket.class, 2)
+                .decoder(LandClaimClaimPacket::decode)
+                .encoder(LandClaimClaimPacket::encode)
+                .consumerMainThread(LandClaimClaimPacket::consume)
+                .add();
     }
 
     public void sendPacket(ServerPlayer serverPlayer, Object packet) {

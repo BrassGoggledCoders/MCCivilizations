@@ -6,10 +6,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
-import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 
 import java.util.Collection;
@@ -46,17 +46,14 @@ public record LandClaimUpdatePacket(
         Civilization civilization = civilizationRepository.getCivilizationById(this.civilizationId());
 
         for (Map.Entry<ResourceKey<Level>, Collection<ChunkPos>> entry : this.positions().entrySet()) {
-            if (this.changeType() == ChangeType.REPLACE) {
-                landClaimRepository.setClaims(this.civilizationId(), entry.getKey(), entry.getValue());
-            } else if (civilization != null) {
+            if (civilization != null) {
                 if (this.changeType() == ChangeType.ADD) {
                     landClaimRepository.addClaims(civilization, entry.getKey(), entry.getValue());
-                } else if (this.changeType() == ChangeType.DELETE) {
+                } else if (this.changeType() == ChangeType.REMOVE) {
                     landClaimRepository.removeClaims(civilization, entry.getKey(), entry.getValue());
                 }
             }
         }
-
     }
 
     public static LandClaimUpdatePacket decode(FriendlyByteBuf friendlyByteBuf) {

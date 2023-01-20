@@ -1,16 +1,22 @@
 package xyz.brassgoggledcoders.mccivilizations.compat.journeymap;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import journeymap.client.api.ClientPlugin;
 import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.display.ModPopupMenu;
+import journeymap.client.api.display.PolygonOverlay;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.FullscreenMapEvent;
 import journeymap.client.api.event.forge.PopupMenuEvent;
 import journeymap.client.api.model.IBlockInfo;
+import journeymap.client.api.model.ShapeProperties;
+import journeymap.client.api.util.PolygonHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,9 +25,10 @@ import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.LandClaimChangedEvent;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
-import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.network.LandClaimClaimPacket;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
@@ -31,10 +38,14 @@ import java.util.Map;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
+    private final Table<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> displayables = HashBasedTable.create();
     private IBlockInfo lastPosition;
+
+    private IClientAPI clientAPI;
 
     @Override
     public void initialize(@NotNull IClientAPI clientAPI) {
+        this.clientAPI = clientAPI;
         clientAPI.subscribe(this.getModId(), EnumSet.of(ClientEvent.Type.MAP_MOUSE_MOVED, ClientEvent.Type.MAPPING_STARTED,
                 ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.DISPLAY_UPDATE));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
@@ -73,18 +84,18 @@ public class JourneyMapPlugin implements IClientPlugin {
                 });
             } else if (chunkCivilization == null) {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.CLAIM_CHUNK.getString(), blockPos ->
-                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
-                                userCivilization.getId(),
-                                Map.of(levelResourceKey, Collections.singletonList(new ChunkPos(blockPos))),
+                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimClaimPacket(
+                                levelResourceKey,
+                                new ChunkPos(blockPos),
                                 ChangeType.ADD
                         ))
                 );
             } else if (chunkCivilization.equals(userCivilization)) {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.UNCLAIM_CHUNK.getString(), blockPos ->
-                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
-                                userCivilization.getId(),
-                                Map.of(levelResourceKey, Collections.singletonList(new ChunkPos(blockPos))),
-                                ChangeType.DELETE
+                        NetworkHandler.getInstance().sendPacketToServer(new LandClaimClaimPacket(
+                                levelResourceKey,
+                                new ChunkPos(blockPos),
+                                ChangeType.REMOVE
                         ))
                 );
             }
@@ -96,6 +107,46 @@ public class JourneyMapPlugin implements IClientPlugin {
     }
 
     private void onClaimChange(LandClaimChangedEvent claimChangedEvent) {
-
+        if (claimChangedEvent.getChangeType() == ChangeType.REMOVE) {
+            for (ChunkPos chunkPos : claimChangedEvent.getChunkPositions()) {
+                CivilizationDisplayable displayable = this.displayables.remove(claimChangedEvent.getLevel(), chunkPos);
+                if (displayable != null && clientAPI.exists(displayable.displayable())) {
+                    clientAPI.remove(displayable.displayable());
+                }
+            }
+        } else if (claimChangedEvent.getChangeType() == ChangeType.ADD) {
+            DyeColor dyeColor = claimChangedEvent.getCivilization().getDyeColor();
+            for (ChunkPos chunkPos : claimChangedEvent.getChunkPositions()) {
+                CivilizationDisplayable newDisplayable = new CivilizationDisplayable(
+                        claimChangedEvent.getCivilization(),
+                        claimChangedEvent.getLevel(),
+                        chunkPos,
+                        new PolygonOverlay(
+                                MCCivilizations.MODID,
+                                "chunk_%d_%d".formatted(chunkPos.x, chunkPos.z),
+                                claimChangedEvent.getLevel(),
+                                new ShapeProperties()
+                                        .setFillColor(dyeColor.getTextColor())
+                                        .setFillOpacity(0.1F)
+                                        .setStrokeColor(dyeColor.getTextColor())
+                                        .setStrokeOpacity(0.15F),
+                                PolygonHelper.createChunkPolygon(
+                                        chunkPos.x,
+                                        chunkPos.z,
+                                        64
+                                )
+                        )
+                );
+                CivilizationDisplayable displayable = this.displayables.put(claimChangedEvent.getLevel(), chunkPos, newDisplayable);
+                if (displayable != null && clientAPI.exists(displayable.displayable())) {
+                    clientAPI.remove(displayable.displayable());
+                }
+                try {
+                    clientAPI.show(newDisplayable.displayable());
+                } catch (Exception e) {
+                    MCCivilizations.LOGGER.error("Failed to Display Chunk", e);
+                }
+            }
+        }
     }
 }

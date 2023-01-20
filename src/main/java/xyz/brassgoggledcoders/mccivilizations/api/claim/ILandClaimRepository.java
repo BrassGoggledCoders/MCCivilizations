@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 
 import java.util.Collection;
-import java.util.UUID;
 
 public interface ILandClaimRepository {
     boolean isClaimed(ResourceKey<Level> level, ChunkPos chunkPos);
@@ -18,8 +17,6 @@ public interface ILandClaimRepository {
     void addClaim(Civilization civilization, ResourceKey<Level> level, ChunkPos chunkPos);
 
     void addClaims(Civilization civilization, ResourceKey<Level> level, Collection<ChunkPos> chunkPosList);
-
-    void setClaims(UUID civilizationId, ResourceKey<Level> level, Collection<ChunkPos> chunkPosList);
 
     void removeClaim(Civilization civilization, ResourceKey<Level> level, ChunkPos chunkPos);
 

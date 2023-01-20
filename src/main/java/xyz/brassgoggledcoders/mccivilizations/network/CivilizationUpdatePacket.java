@@ -23,8 +23,7 @@ public record CivilizationUpdatePacket(
         ICivilizationRepository civilizationRepository = CivilizationRepositories.getCivilizationRepository();
         if (this.changeType() == ChangeType.ADD) {
             this.civilizations().forEach(civilizationRepository::upsertCivilization);
-
-        } else if (this.changeType() == ChangeType.DELETE) {
+        } else if (this.changeType() == ChangeType.REMOVE) {
             this.civilizations().forEach(civilizationRepository::removeCivilization);
         }
     }

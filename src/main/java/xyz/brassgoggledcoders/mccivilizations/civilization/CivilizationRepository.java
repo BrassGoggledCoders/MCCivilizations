@@ -86,7 +86,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
         }
         this.addDirtyId(civilization.getId());
         NetworkHandler.getInstance()
-                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.DELETE));
+                .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.REMOVE));
     }
 
     @Override

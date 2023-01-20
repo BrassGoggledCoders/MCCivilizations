@@ -11,11 +11,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.LandClaimChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
@@ -54,6 +56,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
             this.claimsByPos.put(level, chunkPos, civilization.getId());
             addChunkToOwner(civilization, level, chunkPos);
             this.addDirtyId(civilization.getId());
+            MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, Collections.singletonList(chunkPos), ChangeType.ADD));
             NetworkHandler.getInstance()
                     .sendPacketToAll(new LandClaimUpdatePacket(
                             civilization.getId(),
@@ -75,6 +78,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         }
         if (!updatedPos.isEmpty()) {
             this.addDirtyId(civilization.getId());
+            MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, updatedPos, ChangeType.ADD));
             NetworkHandler.getInstance()
                     .sendPacketToAll(new LandClaimUpdatePacket(
                             civilization.getId(),
@@ -99,16 +103,6 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
     }
 
     @Override
-    public void setClaims(UUID civilizationId, ResourceKey<Level> level, Collection<ChunkPos> chunkPosList) {
-        this.claimsByOwner.put(civilizationId, level, chunkPosList);
-        this.claimsByPos.row(level).clear();
-        for (ChunkPos chunkPos : chunkPosList) {
-            this.claimsByPos.put(level, chunkPos, civilizationId);
-            this.addDirtyId(civilizationId);
-        }
-    }
-
-    @Override
     public void removeClaim(Civilization civilization, ResourceKey<Level> level, ChunkPos chunkPos) {
         if (this.claimsByPos.contains(level, chunkPos)) {
             this.claimsByPos.remove(level, chunkPos);
@@ -119,7 +113,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
                     .sendPacketToAll(new LandClaimUpdatePacket(
                             civilization.getId(),
                             Map.of(level, Collections.singletonList(chunkPos)),
-                            ChangeType.DELETE
+                            ChangeType.REMOVE
                     ));
         }
     }
@@ -137,11 +131,12 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         }
         if (!updatedChunks.isEmpty()) {
             this.addDirtyId(civilization.getId());
+            MinecraftForge.EVENT_BUS.post(new LandClaimChangedEvent(civilization, level, updatedChunks, ChangeType.REMOVE));
             NetworkHandler.getInstance()
                     .sendPacketToAll(new LandClaimUpdatePacket(
                             civilization.getId(),
                             Map.of(level, updatedChunks),
-                            ChangeType.DELETE
+                            ChangeType.REMOVE
                     ));
         }
     }
