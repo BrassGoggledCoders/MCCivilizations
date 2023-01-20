@@ -5,6 +5,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
@@ -30,6 +33,17 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
     protected AbstractCivilizationBannerBlock(CivilizationBannerType bannerType, Properties pProperties) {
         super(pProperties.randomTicks());
         this.bannerType = bannerType;
+    }
+
+    @Override
+    @NotNull
+    @SuppressWarnings("deprecation")
+    @ParametersAreNonnullByDefault
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (this.bannerType == CivilizationBannerType.CAPITAL && pLevel.getBlockEntity(pPos) instanceof CivilizationBannerBlockEntity bannerBlockEntity) {
+            return bannerBlockEntity.handleCapitalBanner(pPlayer, pPlayer.getItemInHand(pHand));
+        }
+        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
     public CivilizationBannerType getBannerType() {

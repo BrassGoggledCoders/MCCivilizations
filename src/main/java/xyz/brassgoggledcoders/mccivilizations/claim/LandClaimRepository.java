@@ -146,6 +146,15 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         }
     }
 
+    @Override
+    public void transferClaims(Civilization fromCivilization, Civilization toCivilization) {
+        Map<ResourceKey<Level>, Collection<ChunkPos>> fromClaims = this.claimsByOwner.row(fromCivilization.getId());
+        for (Map.Entry<ResourceKey<Level>, Collection<ChunkPos>> entry : fromClaims.entrySet()) {
+            this.addClaims(toCivilization, entry.getKey(), entry.getValue());
+        }
+        fromClaims.clear();
+    }
+
     private Civilization getCivilization(UUID uuid) {
         return this.civilizations.getCivilizationById(uuid);
     }
@@ -179,32 +188,22 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
         ListTag claimsList = tag.getList("Claims", Tag.TAG_COMPOUND);
         for (int i = 0; i < claimsList.size(); i++) {
             CompoundTag claimsTag = claimsList.getCompound(i);
-            if (claimsTag.contains("Level")) {
-                ResourceKey<Level> level = ResourceKey.create(
-                        Registry.DIMENSION_REGISTRY,
-                        new ResourceLocation(claimsTag.getString("Level"))
-                );
-                ListTag chunkListTag = claimsTag.getList("Chunks", Tag.TAG_COMPOUND);
-                Collection<ChunkPos> chunkPosList = new ArrayList<>();
-                for (int j = 0; j < chunkListTag.size(); j++) {
-                    CompoundTag chunkTag = chunkListTag.getCompound(j);
-                    ChunkPos chunkPos = new ChunkPos(
-                            chunkTag.getInt("X"),
-                            chunkTag.getInt("Z")
-                    );
-                    chunkPosList.add(chunkPos);
-                    this.claimsByPos.put(Level.OVERWORLD, chunkPos, civilizationId);
-                }
-                this.claimsByOwner.put(civilizationId, level, chunkPosList);
-            } else {
+            ResourceKey<Level> level = ResourceKey.create(
+                    Registry.DIMENSION_REGISTRY,
+                    new ResourceLocation(claimsTag.getString("Level"))
+            );
+            ListTag chunkListTag = claimsTag.getList("Chunks", Tag.TAG_COMPOUND);
+            Collection<ChunkPos> chunkPosList = new ArrayList<>();
+            for (int j = 0; j < chunkListTag.size(); j++) {
+                CompoundTag chunkTag = chunkListTag.getCompound(j);
                 ChunkPos chunkPos = new ChunkPos(
-                        claimsTag.getInt("X"),
-                        claimsTag.getInt("Z")
+                        chunkTag.getInt("X"),
+                        chunkTag.getInt("Z")
                 );
-
-                addChunkToOwner(civilizationId, Level.OVERWORLD, chunkPos);
+                chunkPosList.add(chunkPos);
+                this.claimsByPos.put(Level.OVERWORLD, chunkPos, civilizationId);
             }
-
+            this.claimsByOwner.put(civilizationId, level, chunkPosList);
         }
     }
 

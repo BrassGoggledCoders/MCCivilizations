@@ -18,7 +18,9 @@ public interface ICivilizationRepository {
 
     void upsertCivilization(Civilization civilization);
 
-    void joinCivilization(Civilization civilization, Entity player);
+    boolean joinCivilization(Civilization civilization, Entity player);
+
+    boolean leaveCivilization(Civilization civilization, Entity citizen);
 
     void removeCivilization(Civilization civilization);
 

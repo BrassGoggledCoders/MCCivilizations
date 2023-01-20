@@ -24,4 +24,6 @@ public interface ILandClaimRepository {
     void removeClaim(Civilization civilization, ResourceKey<Level> level, ChunkPos chunkPos);
 
     void removeClaims(Civilization civilization, ResourceKey<Level> level, Collection<ChunkPos> chunkPosList);
+
+    void transferClaims(Civilization fromCivilization, Civilization toCivilization);
 }

@@ -68,6 +68,16 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     }
 
     @Override
+    public void leaveCivilization(Civilization civilization, Entity citizen) {
+        if (this.civilizationsById.containsKey(civilization.getId())) {
+            if (this.civilizationCitizens.remove(civilization.getId(), citizen.getUUID())) {
+                this.civilizationsByCitizen.remove(citizen.getUUID());
+                this.addDirtyId(civilization.getId());
+            }
+        }
+    }
+
+    @Override
     public void removeCivilization(Civilization civilization) {
         this.civilizationsById.remove(civilization.getId());
         Collection<UUID> uuids = this.civilizationCitizens.removeAll(civilization.getId());
