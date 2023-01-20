@@ -1,8 +1,10 @@
 package xyz.brassgoggledcoders.mccivilizations.eventhandler;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -22,7 +24,7 @@ public class LandClaimEventHandler {
     public static void mobGriefingEvent(EntityMobGriefingEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Enemy) {
-            if (CivilizationRepositories.getLandClaimRepository().isClaimed(entity.chunkPosition())) {
+            if (CivilizationRepositories.getLandClaimRepository().isClaimed(entity.getLevel().dimension(), entity.chunkPosition())) {
                 event.setResult(Event.Result.DENY);
             }
         }
@@ -32,8 +34,9 @@ public class LandClaimEventHandler {
     public static void enteringChunk(EntityEvent.EnteringSection event) {
         if (event.didChunkChange() && event.getEntity() instanceof Player player && !player.getLevel().isClientSide()) {
             ILandClaimRepository claimedLand = CivilizationRepositories.getLandClaimRepository();
-            Civilization lastChunkCiv = claimedLand.getClaimOwner(event.getOldPos().chunk());
-            Civilization newChunkCiv = claimedLand.getClaimOwner(event.getNewPos().chunk());
+            ResourceKey<Level> levelKey = player.getLevel().dimension();
+            Civilization lastChunkCiv = claimedLand.getClaimOwner(levelKey, event.getOldPos().chunk());
+            Civilization newChunkCiv = claimedLand.getClaimOwner(levelKey, event.getNewPos().chunk());
 
             if (lastChunkCiv != newChunkCiv) {
                 if (lastChunkCiv != null) {

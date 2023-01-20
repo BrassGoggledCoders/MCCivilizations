@@ -1,76 +1,74 @@
 package xyz.brassgoggledcoders.mccivilizations.network;
 
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraftforge.network.NetworkDirection;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
-import org.jetbrains.annotations.Nullable;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public record LandClaimUpdatePacket(
         UUID civilizationId,
-        Collection<ChunkPos> positions,
+        Map<ResourceKey<Level>, Collection<ChunkPos>> positions,
         ChangeType changeType
 ) {
 
     public void encode(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeUUID(this.civilizationId());
-        friendlyByteBuf.writeCollection(this.positions(), (collectByteBuf, position) -> {
-            collectByteBuf.writeInt(position.x);
-            collectByteBuf.writeInt(position.z);
-        });
+        friendlyByteBuf.writeMap(
+                this.positions(),
+                FriendlyByteBuf::writeResourceKey,
+                (valueByteBuf, positions) -> valueByteBuf.writeCollection(
+                        positions,
+                        (collectByteBuf, position) -> {
+                            collectByteBuf.writeInt(position.x);
+                            collectByteBuf.writeInt(position.z);
+                        }
+                )
+        );
         friendlyByteBuf.writeEnum(this.changeType());
     }
 
-    public void consume(Supplier<NetworkEvent.Context> contextSupplier) {
-        addClaims(contextSupplier.get().getDirection(), contextSupplier.get().getSender());
-    }
-
-    public void addClaims(NetworkDirection direction, @Nullable ServerPlayer player) {
+    public void consume(Supplier<NetworkEvent.Context> ignoredContextSupplier) {
         ILandClaimRepository landClaimRepository = CivilizationRepositories.getLandClaimRepository();
         ICivilizationRepository civilizationRepository = CivilizationRepositories.getCivilizationRepository();
 
         Civilization civilization = civilizationRepository.getCivilizationById(this.civilizationId());
 
-        if (direction == NetworkDirection.LOGIN_TO_CLIENT) {
+        for (Map.Entry<ResourceKey<Level>, Collection<ChunkPos>> entry : this.positions().entrySet()) {
             if (this.changeType() == ChangeType.REPLACE) {
-                landClaimRepository.setClaims(this.civilizationId(), this.positions());
+                landClaimRepository.setClaims(this.civilizationId(), entry.getKey(), entry.getValue());
             } else if (civilization != null) {
                 if (this.changeType() == ChangeType.ADD) {
-                    landClaimRepository.addClaims(civilization, this.positions);
+                    landClaimRepository.addClaims(civilization, entry.getKey(), entry.getValue());
                 } else if (this.changeType() == ChangeType.DELETE) {
-                    landClaimRepository.removeClaims(civilization, this.positions);
-                }
-            }
-        } else if (direction == NetworkDirection.PLAY_TO_SERVER) {
-            if (player != null) {
-                Civilization playerCivilization = civilizationRepository.getCivilizationByCitizen(player);
-                if (playerCivilization == civilization) {
-                    if (this.changeType() == ChangeType.ADD) {
-                        landClaimRepository.addClaims(civilization, this.positions);
-                    } else if (this.changeType() == ChangeType.DELETE) {
-                        landClaimRepository.removeClaims(civilization, this.positions);
-                    }
+                    landClaimRepository.removeClaims(civilization, entry.getKey(), entry.getValue());
                 }
             }
         }
+
     }
 
     public static LandClaimUpdatePacket decode(FriendlyByteBuf friendlyByteBuf) {
         return new LandClaimUpdatePacket(
                 friendlyByteBuf.readUUID(),
-                friendlyByteBuf.readList(collectionByteBuf -> new ChunkPos(
-                        collectionByteBuf.readInt(),
-                        collectionByteBuf.readInt()
-                )),
+                friendlyByteBuf.readMap(
+                        keyByteBuf -> keyByteBuf.readResourceKey(Registry.DIMENSION_REGISTRY),
+                        valueByteBuf -> valueByteBuf.readList(collectionByteBuf -> new ChunkPos(
+                                collectionByteBuf.readInt(),
+                                collectionByteBuf.readInt()
+                        ))
+                ),
                 friendlyByteBuf.readEnum(ChangeType.class)
         );
     }

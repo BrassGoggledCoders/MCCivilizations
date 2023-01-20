@@ -9,21 +9,25 @@ import journeymap.client.api.event.FullscreenMapEvent;
 import journeymap.client.api.event.forge.PopupMenuEvent;
 import journeymap.client.api.model.IBlockInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.claim.LandClaimChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
-import xyz.brassgoggledcoders.mccivilizations.network.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Map;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
@@ -34,6 +38,7 @@ public class JourneyMapPlugin implements IClientPlugin {
         clientAPI.subscribe(this.getModId(), EnumSet.of(ClientEvent.Type.MAP_MOUSE_MOVED, ClientEvent.Type.MAPPING_STARTED,
                 ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.DISPLAY_UPDATE));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
+        MinecraftForge.EVENT_BUS.addListener(this::onClaimChange);
     }
 
     @Override
@@ -54,9 +59,13 @@ public class JourneyMapPlugin implements IClientPlugin {
             ModPopupMenu civilizationsMenu = popupMenuEvent.getPopupMenu()
                     .createSubItemList("Civilizations");
             ILandClaimRepository claimedLand = CivilizationRepositories.getLandClaimRepository();
-            Civilization chunkCivilization = claimedLand.getClaimOwner(lastPosition.getChunkPos());
+            Civilization chunkCivilization = claimedLand.getClaimOwner(player.getLevel().dimension(), lastPosition.getChunkPos());
             Civilization userCivilization = CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationByCitizen(player);
+
+            ResourceKey<Level> levelResourceKey = popupMenuEvent.getFullscreen()
+                    .getUiState()
+                    .dimension;
 
             if (userCivilization == null) {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.CITIZENSHIP_REQUIRED.getString(), blockPos -> {
@@ -66,7 +75,7 @@ public class JourneyMapPlugin implements IClientPlugin {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.CLAIM_CHUNK.getString(), blockPos ->
                         NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
                                 userCivilization.getId(),
-                                Collections.singletonList(new ChunkPos(blockPos)),
+                                Map.of(levelResourceKey, Collections.singletonList(new ChunkPos(blockPos))),
                                 ChangeType.ADD
                         ))
                 );
@@ -74,7 +83,7 @@ public class JourneyMapPlugin implements IClientPlugin {
                 civilizationsMenu.addMenuItem(MCCivilizationsText.UNCLAIM_CHUNK.getString(), blockPos ->
                         NetworkHandler.getInstance().sendPacketToServer(new LandClaimUpdatePacket(
                                 userCivilization.getId(),
-                                Collections.singletonList(new ChunkPos(blockPos)),
+                                Map.of(levelResourceKey, Collections.singletonList(new ChunkPos(blockPos))),
                                 ChangeType.DELETE
                         ))
                 );
@@ -84,5 +93,9 @@ public class JourneyMapPlugin implements IClientPlugin {
 
     private void onMouseMove(FullscreenMapEvent.MouseMoveEvent mouseMoveEvent) {
         this.lastPosition = mouseMoveEvent.getInfo();
+    }
+
+    private void onClaimChange(LandClaimChangedEvent claimChangedEvent) {
+
     }
 }
