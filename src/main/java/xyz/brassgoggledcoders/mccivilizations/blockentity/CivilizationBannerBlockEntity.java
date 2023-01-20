@@ -75,6 +75,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         }
         this.itemPatterns = patternListTag;
         this.patterns = null;
+        this.setChanged();
     }
 
     private Civilization getCivilization() {
@@ -85,6 +86,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                 return civilization;
             } else {
                 this.civilizationUUID = null;
+                this.setChanged();
             }
         }
 
@@ -99,6 +101,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
     @SuppressWarnings("unused")
     public void setCustomName(Component pName) {
         this.name = pName;
+        this.setChanged();
     }
 
     public List<Pair<Holder<BannerPattern>, DyeColor>> getPatterns() {
@@ -130,6 +133,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
             this.fromItem(ItemStack.EMPTY);
         }
         if (update && this.level != null) {
+            this.setChanged();
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
         }
     }
@@ -208,6 +212,9 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                 ILandClaimRepository landClaimRepository = CivilizationRepositories.getLandClaimRepository();
                 if (playerCivilization != null) {
                     landClaimRepository.transferClaims(bannerCivilization, playerCivilization);
+                    civilizationRepository.removeCivilization(bannerCivilization);
+                    this.civilizationUUID = null;
+                    this.setChanged();
                     return InteractionResult.sidedSuccess(isClient);
                 } else {
                     if (civilizationRepository.joinCivilization(bannerCivilization, pPlayer)) {
