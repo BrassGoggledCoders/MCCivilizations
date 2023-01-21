@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -27,6 +28,8 @@ import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.block.AbstractCivilizationBannerBlock;
+import xyz.brassgoggledcoders.mccivilizations.block.CivilizationBannerType;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
 
 import javax.annotation.Nullable;
@@ -78,7 +81,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         this.setChanged();
     }
 
-    private Civilization getCivilization() {
+    public Civilization getCivilization() {
         if (this.civilizationUUID != null) {
             Civilization civilization = CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationById(this.civilizationUUID);
@@ -93,15 +96,19 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         return null;
     }
 
+    public boolean canBeNamedBy(Entity entity) {
+        Civilization civilization = this.getCivilization();
+        if (civilization != null) {
+            return CivilizationRepositories.getCivilizationRepository()
+                    .getCitizens(civilization)
+                    .contains(entity.getUUID());
+        }
+        return false;
+    }
+
     @Nullable
     public Component getCustomName() {
         return this.name;
-    }
-
-    @SuppressWarnings("unused")
-    public void setCustomName(Component pName) {
-        this.name = pName;
-        this.setChanged();
     }
 
     public List<Pair<Holder<BannerPattern>, DyeColor>> getPatterns() {
@@ -223,6 +230,11 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                         return InteractionResult.FAIL;
                     }
                 }
+            } else if (itemInHand.is(Items.NAME_TAG) && itemInHand.hasCustomHoverName()) {
+                if (bannerCivilization == playerCivilization) {
+                    bannerCivilization.setName(itemInHand.getHoverName());
+                    civilizationRepository.upsertCivilization(bannerCivilization);
+                }
             }
         }
 
@@ -232,5 +244,21 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
 
     public DyeColor getDyeColor() {
         return this.dyeColor;
+    }
+
+    public void renameCivilization(Component component) {
+        if (component != null && this.getBannerType() == CivilizationBannerType.CAPITAL) {
+            Civilization civilization = this.getCivilization();
+            civilization.setName(component);
+            CivilizationRepositories.getCivilizationRepository()
+                    .upsertCivilization(civilization);
+        }
+    }
+
+    private CivilizationBannerType getBannerType() {
+        if (this.getBlockState().getBlock() instanceof AbstractCivilizationBannerBlock bannerType) {
+            return bannerType.getBannerType();
+        }
+        return CivilizationBannerType.DECOR
     }
 }
