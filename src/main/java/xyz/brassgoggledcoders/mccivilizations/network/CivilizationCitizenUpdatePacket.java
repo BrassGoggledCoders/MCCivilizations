@@ -16,13 +16,15 @@ import java.util.function.Supplier;
 public record CivilizationCitizenUpdatePacket(
         UUID civilizationId,
         Collection<UUID> citizens,
-        ChangeType changeType
+        ChangeType changeType,
+        int priority
 ) {
 
     public void encode(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeUUID(this.civilizationId());
         friendlyByteBuf.writeCollection(this.citizens(), FriendlyByteBuf::writeUUID);
         friendlyByteBuf.writeEnum(this.changeType());
+        friendlyByteBuf.writeInt(this.priority());
     }
 
     public void consume(Supplier<NetworkEvent.Context> ignored) {
@@ -46,7 +48,7 @@ public record CivilizationCitizenUpdatePacket(
                                 MCCivilizations.LOGGER.error("Failed to Find Civilization for Id: {}", value.civilizationId());
                             }
                         },
-                        3
+                        this.priority()
                 );
     }
 
@@ -54,7 +56,8 @@ public record CivilizationCitizenUpdatePacket(
         return new CivilizationCitizenUpdatePacket(
                 friendlyByteBuf.readUUID(),
                 friendlyByteBuf.readList(FriendlyByteBuf::readUUID),
-                friendlyByteBuf.readEnum(ChangeType.class)
+                friendlyByteBuf.readEnum(ChangeType.class),
+                friendlyByteBuf.readInt()
         );
     }
 }

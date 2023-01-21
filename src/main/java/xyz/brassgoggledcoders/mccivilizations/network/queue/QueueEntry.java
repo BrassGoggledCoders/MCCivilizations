@@ -1,6 +1,7 @@
 package xyz.brassgoggledcoders.mccivilizations.network.queue;
 
 import org.jetbrains.annotations.NotNull;
+import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
@@ -39,7 +40,11 @@ public class QueueEntry<T> implements Comparable<QueueEntry<?>> {
             this.handle.accept(this.value);
             return true;
         } else {
-            return this.attempts.getCount() == 0;
+            boolean giveUp = this.attempts.getCount() == 0;
+            if (giveUp) {
+                MCCivilizations.LOGGER.warn("Tried 5 Times to Update, Packet wasn't Ready: {}", this.value.toString());
+            }
+            return giveUp;
         }
     }
 }

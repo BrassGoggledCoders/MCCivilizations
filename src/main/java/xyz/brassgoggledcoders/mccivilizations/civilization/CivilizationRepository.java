@@ -76,7 +76,8 @@ public class CivilizationRepository extends Repository implements ICivilizationR
                         .sendPacketToAll(new CivilizationCitizenUpdatePacket(
                                 civilization.getId(),
                                 Collections.singleton(citizen),
-                                ChangeType.ADD
+                                ChangeType.ADD,
+                                13
                         ));
             }
             return true;
@@ -95,7 +96,8 @@ public class CivilizationRepository extends Repository implements ICivilizationR
                             .sendPacketToAll(new CivilizationCitizenUpdatePacket(
                                     civilization.getId(),
                                     Collections.singleton(citizen),
-                                    ChangeType.REMOVE
+                                    ChangeType.REMOVE,
+                                    13
                             ));
                 }
                 return true;
@@ -163,7 +165,8 @@ public class CivilizationRepository extends Repository implements ICivilizationR
                     .sendPacket(serverPlayer, new CivilizationCitizenUpdatePacket(
                             civilization.getId(),
                             this.getCitizens(civilization),
-                            ChangeType.ADD
+                            ChangeType.ADD,
+                            3
                     ));
         }
         NetworkHandler.getInstance()
