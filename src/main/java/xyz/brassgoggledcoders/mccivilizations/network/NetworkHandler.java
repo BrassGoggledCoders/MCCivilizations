@@ -1,6 +1,5 @@
 package xyz.brassgoggledcoders.mccivilizations.network;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -37,6 +36,12 @@ public class NetworkHandler {
                 .decoder(LandClaimClaimPacket::decode)
                 .encoder(LandClaimClaimPacket::encode)
                 .consumerMainThread(LandClaimClaimPacket::consume)
+                .add();
+
+        this.simpleChannel.messageBuilder(CivilizationCitizenUpdatePacket.class, 3)
+                .decoder(CivilizationCitizenUpdatePacket::decode)
+                .encoder(CivilizationCitizenUpdatePacket::encode)
+                .consumerMainThread(CivilizationCitizenUpdatePacket::consume)
                 .add();
     }
 

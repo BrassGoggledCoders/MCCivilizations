@@ -2,9 +2,9 @@ package xyz.brassgoggledcoders.mccivilizations.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.network.queue.ClientNetworkQueue;
 

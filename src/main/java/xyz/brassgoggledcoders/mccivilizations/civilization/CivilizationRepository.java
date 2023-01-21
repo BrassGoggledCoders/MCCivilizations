@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.network.CivilizationCitizenUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.CivilizationUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
@@ -65,22 +66,38 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     }
 
     @Override
-    public boolean joinCivilization(Civilization civilization, Entity player) {
+    public boolean joinCivilization(Civilization civilization, UUID citizen) {
         if (this.civilizationsById.containsKey(civilization.getId())) {
-            this.civilizationsByCitizen.put(player.getUUID(), civilization.getId());
-            this.civilizationCitizens.put(civilization.getId(), player.getUUID());
+            this.civilizationsByCitizen.put(citizen, civilization.getId());
+            this.civilizationCitizens.put(civilization.getId(), citizen);
             this.addDirtyId(civilization.getId());
+            if (this.sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new CivilizationCitizenUpdatePacket(
+                                civilization.getId(),
+                                Collections.singleton(citizen),
+                                ChangeType.ADD
+                        ));
+            }
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean leaveCivilization(Civilization civilization, Entity citizen) {
+    public boolean leaveCivilization(Civilization civilization, UUID citizen) {
         if (this.civilizationsById.containsKey(civilization.getId())) {
-            if (this.civilizationCitizens.remove(civilization.getId(), citizen.getUUID())) {
-                this.civilizationsByCitizen.remove(citizen.getUUID());
+            if (this.civilizationCitizens.remove(civilization.getId(), citizen)) {
+                this.civilizationsByCitizen.remove(citizen);
                 this.addDirtyId(civilization.getId());
+                if (this.sync) {
+                    NetworkHandler.getInstance()
+                            .sendPacketToAll(new CivilizationCitizenUpdatePacket(
+                                    civilization.getId(),
+                                    Collections.singleton(citizen),
+                                    ChangeType.REMOVE
+                            ));
+                }
                 return true;
             }
         }
@@ -142,6 +159,12 @@ public class CivilizationRepository extends Repository implements ICivilizationR
         if (civilization != null) {
             NetworkHandler.getInstance()
                     .sendPacket(serverPlayer, new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD, 1));
+            NetworkHandler.getInstance()
+                    .sendPacket(serverPlayer, new CivilizationCitizenUpdatePacket(
+                            civilization.getId(),
+                            this.getCitizens(civilization),
+                            ChangeType.ADD
+                    ));
         }
         NetworkHandler.getInstance()
                 .sendPacket(serverPlayer, new CivilizationUpdatePacket(this.getAllCivilizations(), ChangeType.ADD, 11));

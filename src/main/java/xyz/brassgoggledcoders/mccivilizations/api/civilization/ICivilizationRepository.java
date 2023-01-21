@@ -19,9 +19,17 @@ public interface ICivilizationRepository {
 
     void upsertCivilization(Civilization civilization);
 
-    boolean joinCivilization(Civilization civilization, Entity player);
+    default boolean joinCivilization(Civilization civilization, Entity player) {
+        return this.joinCivilization(civilization, player.getUUID());
+    }
 
-    boolean leaveCivilization(Civilization civilization, Entity citizen);
+    boolean joinCivilization(Civilization civilization, UUID player);
+
+    default boolean leaveCivilization(Civilization civilization, Entity citizen) {
+        return this.leaveCivilization(civilization, citizen.getUUID());
+    }
+
+    boolean leaveCivilization(Civilization civilization, UUID citizen);
 
     void removeCivilization(Civilization civilization);
 
