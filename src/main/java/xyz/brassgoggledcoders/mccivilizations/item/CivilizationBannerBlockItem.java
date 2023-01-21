@@ -13,6 +13,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BannerPattern;
@@ -48,8 +49,12 @@ public class CivilizationBannerBlockItem extends StandingAndWallBlockItem {
         if (pContext.getPlayer() != null) {
             Civilization userCivilization = CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationByCitizen(pContext.getPlayer());
-            if ((userCivilization == null) == (this.getType() == CivilizationBannerType.CAPITAL)) {
-                return super.useOn(pContext);
+            Civilization chunkCivilization = CivilizationRepositories.getLandClaimRepository()
+                    .getClaimOwner(pContext.getLevel().dimension(), new ChunkPos(pContext.getClickedPos()));
+            if (chunkCivilization == null || chunkCivilization == userCivilization || this.getType() == CivilizationBannerType.DECOR) {
+                if ((userCivilization == null) == (this.getType() == CivilizationBannerType.CAPITAL)) {
+                    return super.useOn(pContext);
+                }
             }
         }
 
