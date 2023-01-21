@@ -15,6 +15,10 @@ public interface ICivilizationRepository {
     @Nullable
     Civilization getCivilizationById(UUID id);
 
+    default boolean civilizationExists(UUID id) {
+        return this.getCivilizationById(id) != null;
+    }
+
     Collection<UUID> getCitizens(Civilization civilization);
 
     void upsertCivilization(Civilization civilization);

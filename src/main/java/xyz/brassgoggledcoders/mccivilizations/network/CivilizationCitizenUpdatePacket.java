@@ -31,12 +31,13 @@ public record CivilizationCitizenUpdatePacket(
         ClientNetworkQueue.getInstance()
                 .queue(
                         this,
-                        value -> CivilizationRepositories.getCivilizationRepository().getCivilizationById(value.civilizationId()) != null,
+                        value -> CivilizationRepositories.getCivilizationRepository()
+                                .civilizationExists(value.civilizationId()),
                         value -> {
                             ICivilizationRepository repository = CivilizationRepositories.getCivilizationRepository();
                             Civilization civilization = repository.getCivilizationById(value.civilizationId());
                             if (civilization != null) {
-                                for (UUID citizen: this.citizens()) {
+                                for (UUID citizen : this.citizens()) {
                                     if (this.changeType() == ChangeType.ADD) {
                                         repository.joinCivilization(civilization, citizen);
                                     } else {
