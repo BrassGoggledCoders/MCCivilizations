@@ -35,7 +35,7 @@ import java.util.EnumSet;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
-    private final Table<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> displayables = HashBasedTable.create();
+    private final Table<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> displayable = HashBasedTable.create();
     private IBlockInfo lastPosition;
 
     private IClientAPI clientAPI;
@@ -106,7 +106,7 @@ public class JourneyMapPlugin implements IClientPlugin {
     private void onClaimChange(LandClaimChangedEvent claimChangedEvent) {
         if (claimChangedEvent.getChangeType() == ChangeType.REMOVE) {
             for (ChunkPos chunkPos : claimChangedEvent.getChunkPositions()) {
-                CivilizationDisplayable displayable = this.displayables.remove(claimChangedEvent.getLevel(), chunkPos);
+                CivilizationDisplayable displayable = this.displayable.remove(claimChangedEvent.getLevel(), chunkPos);
                 if (displayable != null && clientAPI.exists(displayable.displayable())) {
                     clientAPI.remove(displayable.displayable());
                 }
@@ -134,7 +134,7 @@ public class JourneyMapPlugin implements IClientPlugin {
                                 )
                         )
                 );
-                CivilizationDisplayable displayable = this.displayables.put(claimChangedEvent.getLevel(), chunkPos, newDisplayable);
+                CivilizationDisplayable displayable = this.displayable.put(claimChangedEvent.getLevel(), chunkPos, newDisplayable);
                 if (displayable != null && clientAPI.exists(displayable.displayable())) {
                     clientAPI.remove(displayable.displayable());
                 }

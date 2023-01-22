@@ -9,8 +9,10 @@ import net.minecraft.world.level.storage.LevelResource;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.location.ILocationRepository;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.location.LocationRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,11 +30,13 @@ public class RepositoryManager {
 
     private final CivilizationRepository civilizationRepository;
     private final LandClaimRepository landClaimRepository;
+    private final LocationRepository locationRepository;
 
     public RepositoryManager(MinecraftServer minecraftServer) {
         this.minecraftServer = minecraftServer;
         this.civilizationRepository = new CivilizationRepository(true);
         this.landClaimRepository = new LandClaimRepository(this.civilizationRepository, true);
+        this.locationRepository = new LocationRepository(this.civilizationRepository, true);
     }
 
     public ICivilizationRepository getCivilizationRepository() {
@@ -43,10 +47,15 @@ public class RepositoryManager {
         return landClaimRepository;
     }
 
+    public ILocationRepository getLocationRepository() {
+        return locationRepository;
+    }
+
     private List<? extends Repository> getRepositories() {
         return List.of(
                 this.civilizationRepository,
-                this.landClaimRepository
+                this.landClaimRepository,
+                this.locationRepository
         );
     }
 

@@ -2,13 +2,17 @@ package xyz.brassgoggledcoders.mccivilizations.repository;
 
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.location.ILocationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ICivilizationRepositoryProvider;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.location.LocationRepository;
 
 public class CivilizationRepositoryProvider implements ICivilizationRepositoryProvider {
     private final ICivilizationRepository clientCivilizations = new CivilizationRepository(false);
     private final ILandClaimRepository clientClaims = new LandClaimRepository(clientCivilizations, false);
+
+    private final ILocationRepository clientLocations = new LocationRepository(clientCivilizations, false);
 
     @Override
     public ICivilizationRepository getCivilizationRepository() {
@@ -25,6 +29,15 @@ public class CivilizationRepositoryProvider implements ICivilizationRepositoryPr
             return RepositoryManager.INSTANCE.getLandClaimRepository();
         } else {
             return clientClaims;
+        }
+    }
+
+    @Override
+    public ILocationRepository getLocationRepository() {
+        if (RepositoryManager.INSTANCE != null) {
+            return RepositoryManager.INSTANCE.getLocationRepository();
+        } else {
+            return clientLocations;
         }
     }
 }

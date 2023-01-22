@@ -1,7 +1,6 @@
 package xyz.brassgoggledcoders.mccivilizations;
 
 import com.google.common.base.Suppliers;
-import com.minerarcana.naming.Naming;
 import com.mojang.logging.LogUtils;
 import com.tterrag.registrate.Registrate;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import xyz.brassgoggledcoders.mccivilizations.compat.naming.NamingCompat;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsLocationTypes;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsRecipes;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
@@ -27,6 +27,7 @@ public class MCCivilizations {
 
     public MCCivilizations() {
         MCCivilizationsBlocks.setup();
+        MCCivilizationsLocationTypes.setup();
         MCCivilizationsRecipes.setup();
         MCCivilizationsText.setup();
 
