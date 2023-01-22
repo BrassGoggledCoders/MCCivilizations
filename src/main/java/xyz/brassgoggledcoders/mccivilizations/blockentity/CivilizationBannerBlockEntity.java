@@ -259,6 +259,6 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (this.getBlockState().getBlock() instanceof AbstractCivilizationBannerBlock bannerType) {
             return bannerType.getBannerType();
         }
-        return CivilizationBannerType.DECOR
+        return CivilizationBannerType.DECOR;
     }
 }
