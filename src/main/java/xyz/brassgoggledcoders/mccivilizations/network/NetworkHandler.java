@@ -43,6 +43,12 @@ public class NetworkHandler {
                 .encoder(CivilizationCitizenUpdatePacket::encode)
                 .consumerMainThread(CivilizationCitizenUpdatePacket::consume)
                 .add();
+
+        this.simpleChannel.messageBuilder(LocationUpdatePacket.class, 4)
+                .decoder(LocationUpdatePacket::decode)
+                .encoder(LocationUpdatePacket::encode)
+                .consumerMainThread(LocationUpdatePacket::consume)
+                .add();
     }
 
     public void sendPacket(ServerPlayer serverPlayer, Object packet) {

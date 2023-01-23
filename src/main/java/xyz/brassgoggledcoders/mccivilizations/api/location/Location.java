@@ -2,6 +2,7 @@ package xyz.brassgoggledcoders.mccivilizations.api.location;
 
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.MCCivilizationsRegistries;
@@ -58,12 +59,28 @@ public class Location {
         return tag;
     }
 
+    public void encode(FriendlyByteBuf friendlyByteBuf) {
+        friendlyByteBuf.writeUUID(this.getId());
+        friendlyByteBuf.writeGlobalPos(this.getPosition());
+        friendlyByteBuf.writeRegistryId(MCCivilizationsRegistries.LOCATION_TYPE_REGISTRY.get(), this.getLocationType());
+        friendlyByteBuf.writeComponent(this.getName());
+    }
+
     public static Location fromNBT(CompoundTag tag) {
         return new Location(
                 tag.getUUID("Id"),
                 NBTHelper.readGlobalPos(tag.getCompound("Position")),
                 MCCivilizationsRegistries.getLocationType(tag.getString("LocationType")),
                 Component.Serializer.fromJson(tag.getString("Name"))
+        );
+    }
+
+    public static Location decode(FriendlyByteBuf friendlyByteBuf) {
+        return new Location(
+                friendlyByteBuf.readUUID(),
+                friendlyByteBuf.readGlobalPos(),
+                friendlyByteBuf.readRegistryId(),
+                friendlyByteBuf.readComponent()
         );
     }
 }

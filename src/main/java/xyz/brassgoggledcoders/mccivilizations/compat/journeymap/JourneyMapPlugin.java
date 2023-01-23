@@ -7,6 +7,7 @@ import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.display.ModPopupMenu;
 import journeymap.client.api.display.PolygonOverlay;
+import journeymap.client.api.display.Waypoint;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.FullscreenMapEvent;
 import journeymap.client.api.event.forge.PopupMenuEvent;
@@ -25,6 +26,8 @@ import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.LandClaimChangedEvent;
+import xyz.brassgoggledcoders.mccivilizations.api.location.Location;
+import xyz.brassgoggledcoders.mccivilizations.api.location.LocationChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
@@ -32,10 +35,14 @@ import xyz.brassgoggledcoders.mccivilizations.network.LandClaimClaimPacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
-    private final Table<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> displayable = HashBasedTable.create();
+    private final Table<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> claimedChunks = HashBasedTable.create();
+    private final Map<UUID, LocationDisplayable> locations = new HashMap<>();
     private IBlockInfo lastPosition;
 
     private IClientAPI clientAPI;
@@ -47,6 +54,7 @@ public class JourneyMapPlugin implements IClientPlugin {
                 ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.MAP_CLICKED));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
         MinecraftForge.EVENT_BUS.addListener(this::onClaimChange);
+        MinecraftForge.EVENT_BUS.addListener(this::onLocationChange);
     }
 
     @Override
@@ -106,7 +114,7 @@ public class JourneyMapPlugin implements IClientPlugin {
     private void onClaimChange(LandClaimChangedEvent claimChangedEvent) {
         if (claimChangedEvent.getChangeType() == ChangeType.REMOVE) {
             for (ChunkPos chunkPos : claimChangedEvent.getChunkPositions()) {
-                CivilizationDisplayable displayable = this.displayable.remove(claimChangedEvent.getLevel(), chunkPos);
+                CivilizationDisplayable displayable = this.claimedChunks.remove(claimChangedEvent.getLevel(), chunkPos);
                 if (displayable != null && clientAPI.exists(displayable.displayable())) {
                     clientAPI.remove(displayable.displayable());
                 }
@@ -134,16 +142,48 @@ public class JourneyMapPlugin implements IClientPlugin {
                                 )
                         )
                 );
-                CivilizationDisplayable displayable = this.displayable.put(claimChangedEvent.getLevel(), chunkPos, newDisplayable);
+                CivilizationDisplayable displayable = this.claimedChunks.put(claimChangedEvent.getLevel(), chunkPos, newDisplayable);
                 if (displayable != null && clientAPI.exists(displayable.displayable())) {
                     clientAPI.remove(displayable.displayable());
                 }
                 try {
                     clientAPI.show(newDisplayable.displayable());
                 } catch (Exception e) {
-                    MCCivilizations.LOGGER.error("Failed to Display Chunk", e);
+                    MCCivilizations.LOGGER.error("Failed to Display Claimed Chunk", e);
                 }
             }
         }
+    }
+
+    public void onLocationChange(LocationChangedEvent event) {
+        Location location = event.getLocation();
+        if (locations.containsKey(location.getId())) {
+            this.clientAPI.remove(locations.get(location.getId()).displayable());
+        }
+
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            Civilization playerCivilization = CivilizationRepositories.getCivilizationRepository()
+                    .getCivilizationByCitizen(player);
+
+            if (playerCivilization != null && playerCivilization.equals(event.getCivilization())) {
+                Waypoint locationWaypoint = new Waypoint(
+                        MCCivilizations.MODID,
+                        location.getId().toString(),
+                        location.getName().getString(),
+                        location.getPosition().dimension(),
+                        location.getPosition().pos()
+                );
+
+                this.locations.put(location.getId(), new LocationDisplayable(location, locationWaypoint));
+
+                try {
+                    this.clientAPI.show(locationWaypoint);
+                } catch (Exception e) {
+                    MCCivilizations.LOGGER.error("Failed to Display Location Waypoint", e);
+                }
+            }
+        }
+
     }
 }

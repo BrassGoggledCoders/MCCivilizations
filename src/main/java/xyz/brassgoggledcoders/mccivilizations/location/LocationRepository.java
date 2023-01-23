@@ -5,16 +5,23 @@ import com.google.common.collect.Table;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.location.ILocationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.location.Location;
+import xyz.brassgoggledcoders.mccivilizations.api.location.LocationChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.location.LocationType;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
+import xyz.brassgoggledcoders.mccivilizations.network.LocationUpdatePacket;
+import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 public class LocationRepository extends Repository implements ILocationRepository {
@@ -46,6 +53,16 @@ public class LocationRepository extends Repository implements ILocationRepositor
             if (locations.column(location.getId()).values().isEmpty()) {
                 locations.put(civilization.getId(), location.getId(), location);
                 this.addDirtyId(civilization.getId());
+                MinecraftForge.EVENT_BUS.post(new LocationChangedEvent(civilization, location, ChangeType.ADD));
+                if (this.sync) {
+                    NetworkHandler.getInstance()
+                            .sendPacketToAll(new LocationUpdatePacket(
+                                    civilization.getId(),
+                                    Collections.singleton(location),
+                                    ChangeType.ADD,
+                                    15
+                            ));
+                }
             }
         }
     }
@@ -55,6 +72,16 @@ public class LocationRepository extends Repository implements ILocationRepositor
         if (locations.contains(location.getId(), location.getId())) {
             locations.remove(civilization.getId(), location.getId());
             this.addDirtyId(civilization.getId());
+            MinecraftForge.EVENT_BUS.post(new LocationChangedEvent(civilization, location, ChangeType.REMOVE));
+            if (this.sync) {
+                NetworkHandler.getInstance()
+                        .sendPacketToAll(new LocationUpdatePacket(
+                                civilization.getId(),
+                                Collections.singleton(location),
+                                ChangeType.REMOVE,
+                                15
+                        ));
+            }
         }
     }
 
@@ -105,6 +132,21 @@ public class LocationRepository extends Repository implements ILocationRepositor
                     location.getId(),
                     location
             );
+        }
+    }
+
+    @Override
+    public void onPlayerJoin(ServerPlayer serverPlayer) {
+        Civilization playerCivilization = this.civilizationRepository.getCivilizationByCitizen(serverPlayer);
+
+        if (playerCivilization != null) {
+            NetworkHandler.getInstance()
+                    .sendPacket(serverPlayer, new LocationUpdatePacket(
+                            playerCivilization.getId(),
+                            this.getLocations(playerCivilization),
+                            ChangeType.ADD,
+                            5
+                    ));
         }
     }
 }
