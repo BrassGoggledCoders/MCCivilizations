@@ -34,10 +34,7 @@ import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.network.LandClaimClaimPacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ClientPlugin
 public class JourneyMapPlugin implements IClientPlugin {
@@ -66,6 +63,11 @@ public class JourneyMapPlugin implements IClientPlugin {
     public void onEvent(@NotNull ClientEvent clientEvent) {
         if (clientEvent instanceof FullscreenMapEvent.MouseMoveEvent mouseMoveEvent) {
             this.onMouseMove(mouseMoveEvent);
+        }
+        if (clientEvent.type == ClientEvent.Type.MAPPING_STARTED) {
+
+            this.clientAPI.getAllWaypoints()
+                    .removeIf(waypoint -> waypoint.getModId().equals(MCCivilizations.MODID));
         }
     }
 
@@ -162,7 +164,7 @@ public class JourneyMapPlugin implements IClientPlugin {
         }
 
         Player player = Minecraft.getInstance().player;
-        if (player != null) {
+        if (player != null && event.getChangeType() == ChangeType.ADD) {
             Civilization playerCivilization = CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationByCitizen(player);
 
@@ -184,6 +186,5 @@ public class JourneyMapPlugin implements IClientPlugin {
                 }
             }
         }
-
     }
 }

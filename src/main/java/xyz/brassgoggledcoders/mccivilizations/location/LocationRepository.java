@@ -22,6 +22,7 @@ import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 public class LocationRepository extends Repository implements ILocationRepository {
@@ -48,9 +49,10 @@ public class LocationRepository extends Repository implements ILocationRepositor
     }
 
     @Override
-    public void addLocation(Civilization civilization, Location location) {
+    public void upsertLocation(Civilization civilization, Location location) {
         if (civilizationRepository.civilizationExists(civilization.getId())) {
-            if (locations.column(location.getId()).values().isEmpty()) {
+            Map<UUID, Location> locationById = locations.column(location.getId());
+            if (locationById.isEmpty() || (locationById.size() == 1 && locationById.containsKey(civilization.getId()))) {
                 locations.put(civilization.getId(), location.getId(), location);
                 this.addDirtyId(civilization.getId());
                 MinecraftForge.EVENT_BUS.post(new LocationChangedEvent(civilization, location, ChangeType.ADD));

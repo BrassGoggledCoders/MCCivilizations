@@ -52,7 +52,7 @@ public class CivilizationBannerBlockItem extends StandingAndWallBlockItem {
             Civilization chunkCivilization = CivilizationRepositories.getLandClaimRepository()
                     .getClaimOwner(pContext.getLevel().dimension(), new ChunkPos(pContext.getClickedPos()));
             if (chunkCivilization == null || chunkCivilization == userCivilization || this.getType() == CivilizationBannerType.DECOR) {
-                if ((userCivilization == null) == (this.getType() == CivilizationBannerType.CAPITAL)) {
+                if (this.getType().canHaveMoreOf(userCivilization)) {
                     return super.useOn(pContext);
                 }
             }

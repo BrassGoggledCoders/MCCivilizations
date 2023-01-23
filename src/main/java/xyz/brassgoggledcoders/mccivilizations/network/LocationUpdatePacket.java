@@ -40,7 +40,7 @@ public record LocationUpdatePacket(
                                 for (Location location : this.locations()) {
                                     if (value.changeType() == ChangeType.ADD) {
                                         CivilizationRepositories.getLocationRepository()
-                                                .addLocation(civilization, location);
+                                                .upsertLocation(civilization, location);
                                     } else {
                                         CivilizationRepositories.getLocationRepository()
                                                 .removeLocation(civilization, location);

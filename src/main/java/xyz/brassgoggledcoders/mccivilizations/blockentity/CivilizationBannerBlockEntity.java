@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.location.Location;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.block.AbstractCivilizationBannerBlock;
 import xyz.brassgoggledcoders.mccivilizations.block.CivilizationBannerType;
@@ -40,6 +41,7 @@ import java.util.UUID;
 
 public class CivilizationBannerBlockEntity extends BlockEntity implements Nameable {
     private UUID civilizationUUID;
+    private UUID locationUUID;
     private Component name;
     private DyeColor dyeColor;
     @Nullable
@@ -66,6 +68,17 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         this.setChanged();
     }
 
+    public void setLocationUUID(UUID uuid) {
+        this.locationUUID = uuid;
+        Location location = this.getLocation();
+        if (location == null) {
+            this.locationUUID = null;
+        } else {
+            this.name = null;
+        }
+        this.setChanged();
+    }
+
     public void fromItem(ItemStack pItem) {
         CompoundTag blockEntityData = BlockItem.getBlockEntityData(pItem);
         ListTag patternListTag = null;
@@ -81,6 +94,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         this.setChanged();
     }
 
+    @Nullable
     public Civilization getCivilization() {
         if (this.civilizationUUID != null) {
             Civilization civilization = CivilizationRepositories.getCivilizationRepository()
@@ -89,6 +103,22 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                 return civilization;
             } else {
                 this.civilizationUUID = null;
+                this.setChanged();
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public Location getLocation() {
+        if (this.locationUUID != null) {
+            Location location = CivilizationRepositories.getLocationRepository()
+                    .getById(this.locationUUID);
+            if (location != null) {
+                return location;
+            } else {
+                this.locationUUID = null;
                 this.setChanged();
             }
         }
@@ -108,7 +138,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
 
     @Nullable
     public Component getCustomName() {
-        return this.name;
+        return this.getName();
     }
 
     public List<Pair<Holder<BannerPattern>, DyeColor>> getPatterns() {
@@ -123,9 +153,15 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
     @NotNull
     public Component getName() {
         if (this.name == null && this.civilizationUUID != null) {
-            this.name = Optional.ofNullable(this.getCivilization())
-                    .map(Civilization::getName)
-                    .orElse(null);
+            this.name = switch (this.getBannerType()) {
+                case CAPITAL -> Optional.ofNullable(this.getCivilization())
+                        .map(Civilization::getName)
+                        .orElse(null);
+                case CITY -> Optional.ofNullable(this.getLocation())
+                        .map(Location::getName)
+                        .orElse(null);
+                default -> null;
+            };
         }
         return this.name != null ? this.name : this.getBlockState().getBlock().getName();
     }
@@ -139,6 +175,12 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
             this.name = null;
             this.fromItem(ItemStack.EMPTY);
         }
+        if (this.getBannerType() == CivilizationBannerType.CITY) {
+            Location location = this.getLocation();
+            if (location != null) {
+                this.name = location.getName();
+            }
+        }
         if (update && this.level != null) {
             this.setChanged();
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
@@ -151,6 +193,9 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (pTag.hasUUID("CivilizationUUID")) {
             this.civilizationUUID = pTag.getUUID("CivilizationUUID");
         }
+        if (pTag.hasUUID("LocationUUID")) {
+            this.locationUUID = pTag.getUUID("LocationUUID");
+        }
         this.checkRefresh(false);
     }
 
@@ -159,6 +204,9 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         super.saveAdditional(pTag);
         if (this.civilizationUUID != null) {
             pTag.putUUID("CivilizationUUID", this.civilizationUUID);
+        }
+        if (this.locationUUID != null) {
+            pTag.putUUID("LocationUUID", this.locationUUID);
         }
     }
 
@@ -176,6 +224,10 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (civilization != null) {
             tag.put("Civilization", civilization.toTag());
         }
+        Location location = this.getLocation();
+        if (location != null) {
+            tag.put("Location", location.toNBT());
+        }
         return tag;
     }
 
@@ -185,6 +237,10 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
             Civilization civilization = Civilization.fromTag(tag.getCompound("Civilization"));
             this.fromItem(civilization.getBanner());
             this.name = civilization.getName();
+            if (tag.contains("Location") && this.getBannerType() == CivilizationBannerType.CITY) {
+                Location location = Location.fromNBT(tag.getCompound("Location"));
+                this.name = location.getName();
+            }
         } else {
             this.fromItem(ItemStack.EMPTY);
             this.name = null;
@@ -197,6 +253,23 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (tag != null) {
             this.handleUpdateTag(tag);
         }
+    }
+
+    public InteractionResult handleCityBanner(Player pPlayer, ItemStack itemInHand) {
+        boolean isClient = Objects.requireNonNull(this.getLevel()).isClientSide();
+        if (itemInHand.is(Items.NAME_TAG) && itemInHand.hasCustomHoverName()) {
+            ICivilizationRepository civilizationRepository = CivilizationRepositories.getCivilizationRepository();
+            Civilization playerCivilization = civilizationRepository.getCivilizationByCitizen(pPlayer);
+            Civilization bannerCivilization = this.getCivilization();
+
+            if (playerCivilization == bannerCivilization) {
+                this.renameLocation(bannerCivilization, itemInHand.getHoverName());
+                return InteractionResult.sidedSuccess(isClient);
+            }
+        }
+
+
+        return InteractionResult.FAIL;
     }
 
     public InteractionResult handleCapitalBanner(Player pPlayer, ItemStack itemInHand) {
@@ -232,8 +305,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                 }
             } else if (itemInHand.is(Items.NAME_TAG) && itemInHand.hasCustomHoverName()) {
                 if (bannerCivilization == playerCivilization) {
-                    bannerCivilization.setName(itemInHand.getHoverName());
-                    civilizationRepository.upsertCivilization(bannerCivilization);
+                    this.renameCivilization(bannerCivilization, itemInHand.getHoverName());
                 }
             }
         }
@@ -242,16 +314,36 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         return InteractionResult.PASS;
     }
 
+    private void renameLocation(Civilization civilization, Component hoverName) {
+        Location location = this.getLocation();
+        if (location != null) {
+            location.setName(hoverName);
+            CivilizationRepositories.getLocationRepository()
+                    .upsertLocation(civilization, location);
+            this.name = null;
+        }
+    }
+
+    private void renameCivilization(Civilization civilization, Component name) {
+        civilization.setName(name);
+        CivilizationRepositories.getCivilizationRepository()
+                .upsertCivilization(civilization);
+        this.renameLocation(civilization, name);
+    }
+
     public DyeColor getDyeColor() {
         return this.dyeColor;
     }
 
-    public void renameCivilization(Component component) {
-        if (component != null && this.getBannerType() == CivilizationBannerType.CAPITAL) {
-            Civilization civilization = this.getCivilization();
-            civilization.setName(component);
-            CivilizationRepositories.getCivilizationRepository()
-                    .upsertCivilization(civilization);
+    public void rename(Component component) {
+        Civilization civilization = this.getCivilization();
+        if (component != null && civilization != null) {
+            CivilizationBannerType civilizationBannerType = this.getBannerType();
+            if (civilizationBannerType == CivilizationBannerType.CAPITAL) {
+                this.renameCivilization(civilization, component);
+            } else if (civilizationBannerType == CivilizationBannerType.CITY) {
+                this.renameLocation(civilization, component);
+            }
         }
     }
 
@@ -260,5 +352,15 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
             return bannerType.getBannerType();
         }
         return CivilizationBannerType.DECOR;
+    }
+
+    public void removeLocation() {
+        Location location = this.getLocation();
+        Civilization civilization = this.getCivilization();
+
+        if (civilization != null && location != null) {
+            CivilizationRepositories.getLocationRepository()
+                    .removeLocation(civilization, location);
+        }
     }
 }

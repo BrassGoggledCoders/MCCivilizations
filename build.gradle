@@ -146,6 +146,7 @@ dependencies {
 }
 
 jar {
+    classifier = "nodep"
     manifest {
         attributes([
                 "Specification-Title"     : "mccivilizations",
@@ -161,6 +162,10 @@ jar {
 
 reobf {
     jarJar { }
+}
+
+tasks.jarJar.configure {
+    classifier ''
 }
 
 jar.finalizedBy('reobfJar')
