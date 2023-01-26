@@ -24,6 +24,14 @@ public class MCCivilizationsText {
     public static final Component CITIZENSHIP_REQUIRED = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("citizenship_required"), "You must be a citizen of a Civilization");
 
+    public static final Component CIVILIZATION_DOES_NOT_EXIST = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_does_not_exist"), "Civilization does not exist");
+    public static final Component SYNCING = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("syncing"), "Syncing Civilization data to the Client");
+
+    public static final Component FAILED_SYNCING = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("failed_syncing"), "Failed ot Sync Civilization data to the Client");
+
     public static Component translate(Component component, Object... args) {
         if (component.getContents() instanceof TranslatableContents translatableContents) {
             return Component.translatable(translatableContents.getKey(), args);
