@@ -91,6 +91,7 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
                                     pPos
                             ),
                             MCCivilizationsLocationTypes.CITY.get(),
+                            pState,
                             name
                     );
                     CivilizationRepositories.getLocationRepository()
@@ -127,6 +128,7 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
                                 pPos
                         ),
                         MCCivilizationsLocationTypes.CAPITAL.get(),
+                        pState,
                         name
                 );
                 CivilizationRepositories.getLocationRepository()

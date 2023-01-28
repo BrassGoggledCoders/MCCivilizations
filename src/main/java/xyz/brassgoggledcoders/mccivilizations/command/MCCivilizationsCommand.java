@@ -7,8 +7,11 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.location.Location;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
+
+import java.util.Locale;
 
 public class MCCivilizationsCommand {
     public static SuggestionProvider<CommandSourceStack> CIVILIZATION_UUID_SUGGESTS = SuggestionProviders.register(
@@ -25,6 +28,7 @@ public class MCCivilizationsCommand {
         event.getDispatcher()
                 .register(Commands.literal("mccivilizations")
                         .then(CivilizationCommand.create())
+                        .then(LocationCommand.create())
                         .then(Commands.literal("sync"))
                         .executes(context -> {
                             CommandSourceStack sourceStack = context.getSource();
