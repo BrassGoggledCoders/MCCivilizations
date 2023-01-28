@@ -99,6 +99,10 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
 
                     CivilizationRepositories.getLandClaimRepository()
                             .addClaim(playerCivilization, pLevel.dimension(), new ChunkPos(pPos));
+
+                    if (!pLevel.isClientSide()) {
+                        player.sendSystemMessage(MCCivilizationsText.CITY_SETTLED);
+                    }
                 }
             } else if (bannerType == CivilizationBannerType.CAPITAL) {
                 Civilization newCivilization = new Civilization(
@@ -131,6 +135,10 @@ public abstract class AbstractCivilizationBannerBlock extends Block implements E
 
                 CivilizationRepositories.getLandClaimRepository()
                         .addClaim(newCivilization, pLevel.dimension(), new ChunkPos(pPos));
+                if (!pLevel.isClientSide()) {
+                    player.sendSystemMessage(MCCivilizationsText.CIVILIZATION_LEADING);
+                }
+
             }
         }
     }

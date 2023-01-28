@@ -32,6 +32,7 @@ import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepos
 import xyz.brassgoggledcoders.mccivilizations.block.AbstractCivilizationBannerBlock;
 import xyz.brassgoggledcoders.mccivilizations.block.CivilizationBannerType;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -280,12 +281,18 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (bannerCivilization != null) {
             if (itemInHand.is(Items.PAPER)) {
                 boolean canJoin = playerCivilization == null;
-                if (playerCivilization != null) {
+                if (playerCivilization != null && playerCivilization != bannerCivilization) {
                     canJoin = civilizationRepository.leaveCivilization(playerCivilization, pPlayer);
+                    if (canJoin && !isClient) {
+                        pPlayer.sendSystemMessage(MCCivilizationsText.CIVILIZATION_LEFT);
+                    }
                 }
                 boolean joined = false;
                 if (canJoin) {
                     joined = civilizationRepository.joinCivilization(bannerCivilization, pPlayer);
+                }
+                if (joined && !isClient) {
+                    pPlayer.sendSystemMessage(MCCivilizationsText.CIVILIZATION_JOINED);
                 }
                 return joined ? InteractionResult.sidedSuccess(isClient) : InteractionResult.FAIL;
             } else if (itemInHand.canPerformAction(ToolActions.SWORD_SWEEP)) {
@@ -295,9 +302,15 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                     civilizationRepository.removeCivilization(bannerCivilization);
                     this.civilizationUUID = null;
                     this.setChanged();
+                    if (!isClient) {
+                        pPlayer.sendSystemMessage(MCCivilizationsText.CIVILIZATION_CONQUERED);
+                    }
                     return InteractionResult.sidedSuccess(isClient);
                 } else {
                     if (civilizationRepository.joinCivilization(bannerCivilization, pPlayer)) {
+                        if (!isClient) {
+                            pPlayer.sendSystemMessage(MCCivilizationsText.CIVILIZATION_JOINED);
+                        }
                         return InteractionResult.sidedSuccess(isClient);
                     } else {
                         return InteractionResult.FAIL;
@@ -306,6 +319,7 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
             } else if (itemInHand.is(Items.NAME_TAG) && itemInHand.hasCustomHoverName()) {
                 if (bannerCivilization == playerCivilization) {
                     this.renameCivilization(bannerCivilization, itemInHand.getHoverName());
+                    return InteractionResult.sidedSuccess(isClient);
                 }
             }
         }

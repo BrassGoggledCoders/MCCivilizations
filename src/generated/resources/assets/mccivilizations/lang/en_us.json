@@ -3,9 +3,17 @@
   "block.mccivilizations.city_standing_banner": "City Banner",
   "block.mccivilizations.decor_standing_banner": "Decorative Banner",
   "text.mccivilizations.citizenship_required": "You must be a citizen of a Civilization",
+  "text.mccivilizations.city_settled": "You have settled a City",
+  "text.mccivilizations.civilization_conquered": "You have conquered this Civilization, and claimed it's land",
+  "text.mccivilizations.civilization_does_not_exist": "Civilization does not exist",
+  "text.mccivilizations.civilization_joined": "You can joined a Civilization",
+  "text.mccivilizations.civilization_leading": "You are now leading this Civilization",
+  "text.mccivilizations.civilization_left": "You have left your Civilization",
   "text.mccivilizations.claim_chunk": "Claim Chunk",
   "text.mccivilizations.entering_civilization": "Entering %s",
+  "text.mccivilizations.failed_syncing": "Failed ot Sync Civilization data to the Client",
   "text.mccivilizations.leaving_civilization": "Leaving %s",
   "text.mccivilizations.no_name_civilization": "No Name",
+  "text.mccivilizations.syncing": "Syncing Civilization data to the Client",
   "text.mccivilizations.unclaim_chunk": "Unclaim Chunk"
 }

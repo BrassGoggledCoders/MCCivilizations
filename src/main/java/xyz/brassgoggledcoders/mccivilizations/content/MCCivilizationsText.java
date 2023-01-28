@@ -32,6 +32,21 @@ public class MCCivilizationsText {
     public static final Component FAILED_SYNCING = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("failed_syncing"), "Failed ot Sync Civilization data to the Client");
 
+    public static final Component CIVILIZATION_JOINED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_joined"), "You can joined a Civilization");
+
+    public static final Component CIVILIZATION_LEFT = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_left"), "You have left your Civilization");
+
+    public static final Component CIVILIZATION_CONQUERED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_conquered"), "You have conquered this Civilization, and claimed it's land");
+
+    public static final Component CIVILIZATION_LEADING = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_leading"), "You are now leading this Civilization");
+
+    public static final Component CITY_SETTLED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("city_settled"), "You have settled a City");
+
     public static Component translate(Component component, Object... args) {
         if (component.getContents() instanceof TranslatableContents translatableContents) {
             return Component.translatable(translatableContents.getKey(), args);
