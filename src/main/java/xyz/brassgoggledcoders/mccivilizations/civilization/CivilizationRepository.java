@@ -179,7 +179,9 @@ public class CivilizationRepository extends Repository implements ICivilizationR
         this.civilizationsById.put(civilization.getId(), civilization);
         ListTag citizens = tag.getList("Citizens", Tag.TAG_INT_ARRAY);
         for (Tag citizen : citizens) {
-            this.civilizationsByCitizen.put(civilization.getId(), NbtUtils.loadUUID(citizen));
+            UUID citizenId = NbtUtils.loadUUID(citizen);
+            this.civilizationsByCitizen.put(citizenId, civilization.getId());
+            this.civilizationCitizens.put(civilization.getId(), citizenId);
         }
     }
 
