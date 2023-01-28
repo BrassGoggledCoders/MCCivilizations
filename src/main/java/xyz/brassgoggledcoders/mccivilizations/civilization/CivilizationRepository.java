@@ -17,8 +17,10 @@ import xyz.brassgoggledcoders.mccivilizations.network.CivilizationCitizenUpdateP
 import xyz.brassgoggledcoders.mccivilizations.network.CivilizationUpdatePacket;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 import xyz.brassgoggledcoders.mccivilizations.repository.Repository;
+import xyz.brassgoggledcoders.mccivilizations.util.DamerauLevenshtein;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CivilizationRepository extends Repository implements ICivilizationRepository {
     private final Map<UUID, Civilization> civilizationsById;
@@ -123,6 +125,32 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     @Override
     public Collection<Civilization> getAllCivilizations() {
         return this.civilizationsById.values();
+    }
+
+    @Override
+    @NotNull
+    public Collection<Civilization> getCivilizationByName(String name) {
+        Map<String, Collection<Civilization>> civilizationMap = this.getAllCivilizations()
+                .stream()
+                .collect(Collectors.toMap(
+                        civilization -> civilization.getName().getString(),
+                        civilization -> {
+                            ArrayList<Civilization> civilizations = new ArrayList<>();
+                            civilizations.add(civilization);
+                            return civilizations;
+                        },
+                        (u, v) -> {
+                            u.addAll(v);
+                            return u;
+                        }
+                ));
+
+        return DamerauLevenshtein.getClosest(name, civilizationMap.keySet(), 4)
+                .stream()
+                .map(civilizationMap::get)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override

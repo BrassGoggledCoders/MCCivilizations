@@ -13,7 +13,12 @@ import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 public class MCCivilizationsCommand {
     public static SuggestionProvider<CommandSourceStack> CIVILIZATION_UUID_SUGGESTS = SuggestionProviders.register(
             MCCivilizations.rl("civilization_uuid"),
-            new CivilizationIdSuggestionProvider<>()
+            new CivilizationIdSuggestionProvider<>(civilization -> civilization.getId().toString())
+    );
+
+    public static SuggestionProvider<CommandSourceStack> CIVILIZATION_NAME_SUGGESTS = SuggestionProviders.register(
+            MCCivilizations.rl("civilization_name"),
+            new CivilizationIdSuggestionProvider<>(civilization -> civilization.getName().getString())
     );
 
     public static void register(RegisterCommandsEvent event) {

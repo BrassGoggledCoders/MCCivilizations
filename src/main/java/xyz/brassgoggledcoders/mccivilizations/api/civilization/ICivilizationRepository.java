@@ -38,4 +38,6 @@ public interface ICivilizationRepository {
     void removeCivilization(Civilization civilization);
 
     Collection<Civilization> getAllCivilizations();
+
+    Collection<Civilization> getCivilizationByName(String name);
 }

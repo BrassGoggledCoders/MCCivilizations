@@ -52,6 +52,17 @@ public class Civilization {
     public void setDyeColor(DyeColor dyeColor) {
         this.dyeColor = dyeColor;
     }
+
+    @Override
+    public String toString() {
+        return "Civilization{" +
+                "id=" + id +
+                ", name=" + name +
+                ", banner=" + banner +
+                ", dyeColor=" + dyeColor +
+                '}';
+    }
+
     public CompoundTag toTag() {
         CompoundTag tag = new CompoundTag();
         tag.putUUID("Id", this.getId());

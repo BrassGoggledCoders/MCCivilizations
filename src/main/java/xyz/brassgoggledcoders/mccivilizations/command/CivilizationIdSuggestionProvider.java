@@ -8,18 +8,23 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
-public class CivilizationIdSuggestionProvider<T> implements SuggestionProvider<T> {
+public class CivilizationIdSuggestionProvider<T, U> implements SuggestionProvider<T> {
+    private final Function<Civilization, String> fromCivToString;
+
+    public CivilizationIdSuggestionProvider(Function<Civilization, String> fromCivToString) {
+        this.fromCivToString = fromCivToString;
+    }
+
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(
                 CivilizationRepositories.getCivilizationRepository()
                         .getAllCivilizations()
                         .stream()
-                        .map(Civilization::getId)
-                        .map(UUID::toString),
+                        .map(fromCivToString),
                 builder
         );
     }
