@@ -47,6 +47,12 @@ public class MCCivilizationsText {
     public static final Component CITY_SETTLED = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("city_settled"), "You have settled a City");
 
+    public static final Component NO_LOCATIONS_TO_FIX = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("no_locations_fixed"), "No Locations needed fixing");
+
+    public static final Component FIXED_LOCATIONS = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("locations_fixed"), "Fixed %s Locations");
+
     public static Component translate(Component component, Object... args) {
         if (component.getContents() instanceof TranslatableContents translatableContents) {
             return Component.translatable(translatableContents.getKey(), args);

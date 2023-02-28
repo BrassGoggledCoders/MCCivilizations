@@ -3,6 +3,7 @@ package xyz.brassgoggledcoders.mccivilizations.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -13,10 +14,14 @@ import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepos
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class LocationCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> create() {
         return Commands.literal("location")
+                .requires(stack -> stack.isPlayer() && CivilizationRepositories.getCivilizationRepository()
+                        .getCivilizationByCitizen(Objects.requireNonNull(stack.getPlayer())) != null
+                )
                 .then(Commands.literal("fix")
                         .executes(context -> {
                             Entity entity = context.getSource().getEntityOrException();
@@ -34,12 +39,17 @@ public class LocationCommand {
                                     ServerLevel level = server.getLevel(location.getPosition().dimension());
                                     if (level != null && level.isLoaded(location.getPosition().pos())) {
                                         BlockState currentState = level.getBlockState(location.getPosition().pos());
-                                        if (!currentState.is(location.getBlockState().getBlock())) {
+                                        if (currentState.isAir() || !currentState.is(location.getBlockState().getBlock())) {
                                             fixed++;
                                             CivilizationRepositories.getLocationRepository()
                                                     .removeLocation(civilization, location);
                                         }
                                     }
+                                }
+                                if (fixed > 0) {
+                                    context.getSource().sendSuccess(MCCivilizationsText.translate(MCCivilizationsText.FIXED_LOCATIONS, fixed), true);
+                                } else {
+                                    context.getSource().sendFailure(MCCivilizationsText.NO_LOCATIONS_TO_FIX);
                                 }
                                 return fixed;
                             } else {
