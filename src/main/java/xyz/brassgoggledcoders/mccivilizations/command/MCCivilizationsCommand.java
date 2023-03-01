@@ -31,6 +31,7 @@ public class MCCivilizationsCommand {
         event.getDispatcher()
                 .register(Commands.literal("mccivilizations")
                         .then(CivilizationCommand.create())
+                        .then(LandClaimCommand.create())
                         .then(LocationCommand.create())
                         .then(Commands.literal("sync"))
                         .executes(context -> {

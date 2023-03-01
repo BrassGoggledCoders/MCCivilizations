@@ -21,6 +21,17 @@ public class MCCivilizationsText {
     public static final Component UNCLAIM_CHUNK = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("unclaim_chunk"), "Unclaim Chunk");
 
+    public static final Component CHUNK_ALREADY_CLAIMED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("claim_already_claimed"), "Chunk is already claimed");
+
+    public static final Component CHUNK_NOT_CLAIMED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("claim_not_claimed"), "Chunk is not claimed by you");
+
+    public static final Component CHUNK_CLAIMED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("claim_claimed"), "Chunk is now claimed");
+
+    public static final Component CHUNK_UNCLAIMED = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("claim_unclaimed"), "Chunk is now unclaimed");
     public static final Component CITIZENSHIP_REQUIRED = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("citizenship_required"), "You must be a citizen of a Civilization");
 
