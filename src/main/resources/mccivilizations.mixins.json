@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.brassgoggledcoders.mccivilizations.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mccivilizations.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -89,6 +89,12 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.main, "mccivilizations.refmap.json"
+
+    config "mccivilizations.mixins.json"
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
