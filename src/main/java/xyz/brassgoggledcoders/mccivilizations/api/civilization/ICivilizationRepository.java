@@ -19,6 +19,10 @@ public interface ICivilizationRepository {
         return this.getCivilizationById(id) != null;
     }
 
+    default boolean isCitizen(@Nullable Entity entity) {
+        return entity != null && this.getCivilizationByCitizen(entity) != null;
+    }
+
     Collection<UUID> getCitizens(Civilization civilization);
 
     void upsertCivilization(Civilization civilization);

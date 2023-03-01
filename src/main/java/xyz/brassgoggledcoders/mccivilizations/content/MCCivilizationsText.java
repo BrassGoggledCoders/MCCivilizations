@@ -33,10 +33,13 @@ public class MCCivilizationsText {
             .addLang("text", MCCivilizations.rl("failed_syncing"), "Failed ot Sync Civilization data to the Client");
 
     public static final Component CIVILIZATION_JOINED = MCCivilizations.getRegistrate()
-            .addLang("text", MCCivilizations.rl("civilization_joined"), "You can joined a Civilization");
+            .addLang("text", MCCivilizations.rl("civilization_joined"), "You have joined a Civilization");
 
     public static final Component CIVILIZATION_LEFT = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("civilization_left"), "You have left your Civilization");
+
+    public static final Component CIVILIZATION_ALREADY_MEMBER = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("civilization_already_member"), "You are already a citizen of another Civilization");
 
     public static final Component CIVILIZATION_CONQUERED = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("civilization_conquered"), "You have conquered this Civilization, and claimed it's land");

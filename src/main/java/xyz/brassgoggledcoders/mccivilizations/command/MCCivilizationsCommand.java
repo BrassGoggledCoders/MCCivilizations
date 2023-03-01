@@ -7,6 +7,7 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
+import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 
@@ -20,6 +21,11 @@ public class MCCivilizationsCommand {
             MCCivilizations.rl("civilization_name"),
             new CivilizationIdSuggestionProvider<>(civilization -> civilization.getName().getString())
     );
+
+    public static boolean alreadyMember(CommandSourceStack commandSourceStack) {
+        return CivilizationRepositories.getCivilizationRepository()
+                .isCitizen(commandSourceStack.getEntity());
+    }
 
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher()
