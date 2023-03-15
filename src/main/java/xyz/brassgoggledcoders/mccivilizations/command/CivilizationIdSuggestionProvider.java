@@ -11,7 +11,7 @@ import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepos
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public class CivilizationIdSuggestionProvider<T, U> implements SuggestionProvider<T> {
+public class CivilizationIdSuggestionProvider<T> implements SuggestionProvider<T> {
     private final Function<Civilization, String> fromCivToString;
 
     public CivilizationIdSuggestionProvider(Function<Civilization, String> fromCivToString) {

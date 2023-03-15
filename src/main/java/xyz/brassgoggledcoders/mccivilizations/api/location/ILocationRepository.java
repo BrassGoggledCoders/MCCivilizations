@@ -17,5 +17,7 @@ public interface ILocationRepository {
 
     Collection<Location> getLocations(Civilization civilization);
 
+    Collection<Location> getAllLocations();
+
     Location getById(UUID uuid);
 }

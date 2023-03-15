@@ -41,7 +41,6 @@ public class LandClaimCommand {
                         )
                         .executes(commandCreator.apply(false, LandClaimCommand::getHere))
                 )
-                .requires(MCCivilizationsCommand::alreadyMember)
                 .then(Commands.argument("offset", Vec2Argument.vec2())
                         .executes(commandCreator.apply(false, context -> Vec2Argument.getVec2(context, "offset")))
                 )

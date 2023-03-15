@@ -7,7 +7,7 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
-import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.command.suggestion.LocationIdSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
 
@@ -22,10 +22,15 @@ public class MCCivilizationsCommand {
             new CivilizationIdSuggestionProvider<>(civilization -> civilization.getName().getString())
     );
 
-    public static boolean alreadyMember(CommandSourceStack commandSourceStack) {
-        return CivilizationRepositories.getCivilizationRepository()
-                .isCitizen(commandSourceStack.getEntity());
-    }
+    public static SuggestionProvider<CommandSourceStack> LOCATION_UUID_SUGGESTS = SuggestionProviders.register(
+            MCCivilizations.rl("location_uuid"),
+            new LocationIdSuggestionProvider<>(location -> location.getId().toString())
+    );
+
+    public static SuggestionProvider<CommandSourceStack> LOCATION_NAME_SUGGESTS = SuggestionProviders.register(
+            MCCivilizations.rl("location_name"),
+            new LocationIdSuggestionProvider<>(location -> location.getId().toString())
+    );
 
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher()
@@ -33,19 +38,20 @@ public class MCCivilizationsCommand {
                         .then(CivilizationCommand.create())
                         .then(LandClaimCommand.create())
                         .then(LocationCommand.create())
-                        .then(Commands.literal("sync"))
-                        .executes(context -> {
-                            CommandSourceStack sourceStack = context.getSource();
-                            ServerPlayer serverPlayer = sourceStack.getPlayer();
-                            if (serverPlayer != null) {
-                                sourceStack.sendSuccess(MCCivilizationsText.SYNCING, true);
-                                RepositoryManager.INSTANCE.playerLoggedIn(serverPlayer);
-                                return 1;
-                            } else {
-                                sourceStack.sendFailure(MCCivilizationsText.FAILED_SYNCING);
-                                return 0;
-                            }
-                        })
+                        .then(Commands.literal("sync")
+                                .executes(context -> {
+                                    CommandSourceStack sourceStack = context.getSource();
+                                    ServerPlayer serverPlayer = sourceStack.getPlayer();
+                                    if (serverPlayer != null) {
+                                        sourceStack.sendSuccess(MCCivilizationsText.SYNCING, true);
+                                        RepositoryManager.INSTANCE.playerLoggedIn(serverPlayer);
+                                        return 1;
+                                    } else {
+                                        sourceStack.sendFailure(MCCivilizationsText.FAILED_SYNCING);
+                                        return 0;
+                                    }
+                                })
+                        )
                 );
     }
 }

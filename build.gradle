@@ -17,7 +17,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'xyz.brassgoggledcoders.mccivilizations'
-version = '0.1.2'
+version = '0.2.0'
 
 java {
     archivesBaseName = 'mccivilizations'
@@ -141,8 +141,6 @@ dependencies {
 
     compileOnly fg.deobf(group: 'info.journeymap', name: 'journeymap-api', version: '1.19.1-1.9-SNAPSHOT', changing: true)
     runtimeOnly fg.deobf("curse.maven:journeymap-32274:4321645")
-
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {

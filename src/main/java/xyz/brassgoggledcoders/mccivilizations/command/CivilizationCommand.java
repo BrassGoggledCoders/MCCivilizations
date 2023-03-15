@@ -30,22 +30,23 @@ public class CivilizationCommand {
                 .then(withCivilization("describe", CivilizationCommand::executeDescribeCivilizations))
                 .requires(CommandSourceStack::isPlayer)
                 .then(withCivilization("join", CivilizationCommand::joinCivilization))
-                .requires(MCCivilizationsCommand::alreadyMember)
-                .then(Commands.literal("leave"))
-                .executes(context -> {
-                    ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-                    ICivilizationRepository civilizationRepository = CivilizationRepositories.getCivilizationRepository();
-                    Civilization civilization = civilizationRepository.getCivilizationByCitizen(serverPlayer);
+                .then(Commands.literal("leave")
+                        .executes(context -> {
+                            ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
+                            ICivilizationRepository civilizationRepository = CivilizationRepositories.getCivilizationRepository();
+                            Civilization civilization = civilizationRepository.getCivilizationByCitizen(serverPlayer);
 
-                    if (civilization != null) {
-                        if (civilizationRepository.leaveCivilization(civilization, serverPlayer)) {
-                            context.getSource().sendSuccess(MCCivilizationsText.CIVILIZATION_LEFT, true);
-                            return 1;
-                        }
-                    }
-                    context.getSource().sendFailure(MCCivilizationsText.CIVILIZATION_DOES_NOT_EXIST);
-                    return 0;
-                });
+                            if (civilization != null) {
+                                if (civilizationRepository.leaveCivilization(civilization, serverPlayer)) {
+                                    context.getSource().sendSuccess(MCCivilizationsText.CIVILIZATION_LEFT, true);
+                                    return 1;
+                                }
+                            }
+                            context.getSource().sendFailure(MCCivilizationsText.CIVILIZATION_DOES_NOT_EXIST);
+                            return 0;
+                        })
+                );
+
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> withCivilization(
@@ -87,7 +88,6 @@ public class CivilizationCommand {
                                 .getEntityOrException()
                         )).stream()
                 ));
-
     }
 
     private static Command<CommandSourceStack> executeDescribeCivilizations(

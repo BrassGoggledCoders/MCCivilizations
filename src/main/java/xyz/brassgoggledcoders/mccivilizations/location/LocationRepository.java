@@ -101,6 +101,11 @@ public class LocationRepository extends Repository implements ILocationRepositor
     }
 
     @Override
+    public Collection<Location> getAllLocations() {
+        return locations.values();
+    }
+
+    @Override
     @Nullable
     public Location getById(UUID uuid) {
         return locations.column(uuid).values()
