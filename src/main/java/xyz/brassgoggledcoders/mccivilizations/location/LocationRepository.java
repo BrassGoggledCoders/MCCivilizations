@@ -71,7 +71,7 @@ public class LocationRepository extends Repository implements ILocationRepositor
 
     @Override
     public void removeLocation(Civilization civilization, Location location) {
-        if (locations.contains(location.getId(), location.getId())) {
+        if (locations.contains(civilization.getId(), location.getId())) {
             locations.remove(civilization.getId(), location.getId());
             this.addDirtyId(civilization.getId());
             MinecraftForge.EVENT_BUS.post(new LocationChangedEvent(civilization, location, ChangeType.REMOVE));
