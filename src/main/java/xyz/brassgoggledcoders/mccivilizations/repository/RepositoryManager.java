@@ -115,8 +115,8 @@ public class RepositoryManager {
                                 MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), serializedValue.toString()), e);
                             }
                         }
-
                     }
+                    repository.clearDirtyIds();
                 }
             }
         }

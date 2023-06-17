@@ -32,6 +32,10 @@ public abstract class Repository {
         return this.dirtyIds;
     }
 
+    public void clearDirtyIds() {
+        this.dirtyIds.clear();
+    }
+
     @Nullable
     public abstract CompoundTag getSerializedValue(UUID id);
 
