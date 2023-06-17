@@ -21,6 +21,7 @@
   "text.mccivilizations.locations_fixed": "Fixed %s Locations",
   "text.mccivilizations.no_locations_fixed": "No Locations needed fixing",
   "text.mccivilizations.no_name_civilization": "No Name",
+  "text.mccivilizations.save_all": "Saving all Civilization Data",
   "text.mccivilizations.syncing": "Syncing Civilization data to the Client",
   "text.mccivilizations.unclaim_chunk": "Unclaim Chunk",
   "text.mccivilizations.unknown_location_type": "Unknown Location Type: %s"

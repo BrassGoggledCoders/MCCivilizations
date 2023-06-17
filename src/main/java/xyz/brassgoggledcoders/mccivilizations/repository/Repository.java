@@ -6,10 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class Repository {
     private final String name;
@@ -19,6 +16,8 @@ public abstract class Repository {
         this.name = name;
         this.dirtyIds = new ArrayList<>();
     }
+
+    public abstract Collection<UUID> getIds();
 
     public boolean isDirty() {
         return !dirtyIds.isEmpty();
@@ -48,5 +47,4 @@ public abstract class Repository {
     public void onPlayerJoin(ServerPlayer serverPlayer) {
 
     }
-
 }

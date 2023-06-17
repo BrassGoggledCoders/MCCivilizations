@@ -16,17 +16,21 @@ import xyz.brassgoggledcoders.mccivilizations.location.LocationRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class RepositoryManager {
+public class RepositoryManager implements AutoCloseable {
     public static RepositoryManager INSTANCE = null;
 
     private static final LevelResource REPOSITORY_FOLDER = new LevelResource("data/mccivilizations");
     private final MinecraftServer minecraftServer;
+    private final ExecutorService ioExecutor;
 
     private final CivilizationRepository civilizationRepository;
     private final LandClaimRepository landClaimRepository;
@@ -37,6 +41,7 @@ public class RepositoryManager {
         this.civilizationRepository = new CivilizationRepository(true);
         this.landClaimRepository = new LandClaimRepository(this.civilizationRepository, true);
         this.locationRepository = new LocationRepository(this.civilizationRepository, true);
+        this.ioExecutor = new ThreadPoolExecutor(0, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     }
 
     public ICivilizationRepository getCivilizationRepository() {
@@ -84,8 +89,12 @@ public class RepositoryManager {
     }
 
     public void save() {
+        save(false);
+    }
+
+    public void save(boolean all) {
         for (Repository repository : this.getRepositories()) {
-            if (repository.isDirty()) {
+            if (all || repository.isDirty()) {
                 File repositoryDirectory = this.minecraftServer.getWorldPath(REPOSITORY_FOLDER)
                         .resolve(repository.getName())
                         .toFile();
@@ -95,26 +104,11 @@ public class RepositoryManager {
                     canSave = repositoryDirectory.mkdirs();
                 }
                 if (canSave) {
-                    List<UUID> dirtyIds = new ArrayList<>(repository.getDirtyIds());
-                    for (UUID id : dirtyIds) {
+                    List<UUID> idsToSave = new ArrayList<>(all ? repository.getIds() : repository.getDirtyIds());
+                    for (UUID id : idsToSave) {
                         CompoundTag serializedValue = repository.getSerializedValue(id);
                         Path path = repositoryDirectory.toPath().resolve(id.toString() + ".nbt");
-                        if (serializedValue == null) {
-                            try {
-                                Files.delete(path);
-                            } catch (IOException e) {
-                                MCCivilizations.LOGGER.error("Failed to delete file %s".formatted(path.toString()), e);
-                            }
-                        } else {
-                            try {
-                                NbtIo.write(
-                                        serializedValue,
-                                        path.toFile()
-                                );
-                            } catch (IOException e) {
-                                MCCivilizations.LOGGER.error("Failed to save file %s's content: %s".formatted(path.toString(), serializedValue.toString()), e);
-                            }
-                        }
+                        this.ioExecutor.execute(new SaveTask(path, serializedValue));
                     }
                     repository.clearDirtyIds();
                 }
@@ -128,5 +122,24 @@ public class RepositoryManager {
                 repository.onPlayerJoin(serverPlayer);
             }
         }
+    }
+
+    @Override
+    public void close() {
+        this.save();
+        this.ioExecutor.shutdown();
+        try {
+            if (!this.ioExecutor.isTerminated()) {
+                MCCivilizations.LOGGER.info("Saving Civilizations data");
+                if (!this.ioExecutor.awaitTermination(5, TimeUnit.MINUTES)) {
+                    MCCivilizations.LOGGER.error("Failed to finish all tasks while saving Civilizations");
+                } else {
+                    MCCivilizations.LOGGER.info("Finished saving Civilizations data");
+                }
+            }
+        } catch (InterruptedException e) {
+            MCCivilizations.LOGGER.error("Interrupted while saving Civilizations", e);
+        }
+
     }
 }

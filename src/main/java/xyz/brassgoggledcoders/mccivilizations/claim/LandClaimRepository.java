@@ -171,6 +171,11 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
     }
 
     @Override
+    public Collection<UUID> getIds() {
+        return this.claimsByOwner.rowKeySet();
+    }
+
+    @Override
     @NotNull
     public CompoundTag getSerializedValue(UUID id) {
         CompoundTag serializedValue = new CompoundTag();

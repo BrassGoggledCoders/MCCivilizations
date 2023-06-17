@@ -70,6 +70,9 @@ public class MCCivilizationsText {
     public static final Component UNKNOWN_LOCATION_TYPE = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("unknown_location_type"), "Unknown Location Type: %s");
 
+    public static final Component SAVE_ALL = MCCivilizations.getRegistrate()
+            .addLang("text", MCCivilizations.rl("save_all"), "Saving all Civilization Data");
+
     public static Component translate(Component component, Object... args) {
         if (component.getContents() instanceof TranslatableContents translatableContents) {
             return Component.translatable(translatableContents.getKey(), args);

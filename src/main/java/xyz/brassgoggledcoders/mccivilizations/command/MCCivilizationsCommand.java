@@ -6,6 +6,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.server.permission.PermissionAPI;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.command.suggestion.LocationIdSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
@@ -50,6 +51,14 @@ public class MCCivilizationsCommand {
                                         sourceStack.sendFailure(MCCivilizationsText.FAILED_SYNCING);
                                         return 0;
                                     }
+                                })
+                        )
+                        .then(Commands.literal("save-all")
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                .executes(context -> {
+                                    RepositoryManager.INSTANCE.save(true);
+                                    context.getSource().sendSuccess(MCCivilizationsText.SAVE_ALL, true);
+                                    return 1;
                                 })
                         )
                 );

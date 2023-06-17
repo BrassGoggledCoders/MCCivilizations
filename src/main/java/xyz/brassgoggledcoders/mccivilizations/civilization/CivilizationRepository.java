@@ -154,6 +154,11 @@ public class CivilizationRepository extends Repository implements ICivilizationR
     }
 
     @Override
+    public Collection<UUID> getIds() {
+        return this.civilizationsById.keySet();
+    }
+
+    @Override
     @Nullable
     public CompoundTag getSerializedValue(UUID id) {
         Civilization civilization = this.civilizationsById.get(id);

@@ -1,12 +1,12 @@
-// 1.19.2	2023-03-14T20:02:38.6718283	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.19.2	2023-06-17T15:14:54.88297	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_hanging_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_standing_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/city_hanging_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/city_standing_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/decor_hanging_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/decor_standing_banner.json
-dbaf3768b1fa3d95f034141b42341eebef811ca3 assets/mccivilizations/lang/en_ud.json
-dd5600357d74b87d228a5f30734ea951f12bc38f assets/mccivilizations/lang/en_us.json
+e927af3320375db9e907e1872caee2c82547520a assets/mccivilizations/lang/en_ud.json
+6c64322ff6b237ce68a55d849b71a089c81fd6a2 assets/mccivilizations/lang/en_us.json
 509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/capital_banner.json
 509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/city_banner.json
 509c39e5f9792a5b70b9dd9cf995e08eb0005b8b assets/mccivilizations/models/item/decor_banner.json

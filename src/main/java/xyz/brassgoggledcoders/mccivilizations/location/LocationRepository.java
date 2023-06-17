@@ -115,6 +115,11 @@ public class LocationRepository extends Repository implements ILocationRepositor
     }
 
     @Override
+    public Collection<UUID> getIds() {
+        return this.locations.rowKeySet();
+    }
+
+    @Override
     @Nullable
     public CompoundTag getSerializedValue(UUID id) {
         CompoundTag tag = new CompoundTag();

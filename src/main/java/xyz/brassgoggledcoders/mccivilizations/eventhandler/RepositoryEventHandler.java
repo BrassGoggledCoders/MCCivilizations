@@ -33,7 +33,7 @@ public class RepositoryEventHandler {
 
     @SubscribeEvent
     public static void serverStopping(ServerStoppingEvent serverStoppingEvent) {
-        RepositoryManager.INSTANCE.save();
+        RepositoryManager.INSTANCE.close();
         RepositoryManager.INSTANCE = null;
     }
 
