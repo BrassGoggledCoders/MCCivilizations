@@ -212,7 +212,7 @@ public class LandClaimRepository extends Repository implements ILandClaimReposit
                         chunkTag.getInt("Z")
                 );
                 chunkPosList.add(chunkPos);
-                this.claimsByPos.put(Level.OVERWORLD, chunkPos, civilizationId);
+                this.claimsByPos.put(level, chunkPos, civilizationId);
             }
             this.claimsByOwner.put(civilizationId, level, chunkPosList);
         }
