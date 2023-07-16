@@ -77,22 +77,28 @@ public class CivilizationBannerBlockItem extends StandingAndWallBlockItem {
 
     public List<Pair<Holder<BannerPattern>, DyeColor>> getPatterns(@Nullable Player player, ItemStack itemStack) {
         CompoundTag bannerTag = null;
-        if (this.getType() == CivilizationBannerType.CAPITAL) {
-            bannerTag = BlockItem.getBlockEntityData(itemStack);
-        } else if (player != null) {
+        DyeColor dyeColor = DyeColor.WHITE;
+        if (player != null) {
             Civilization civilization = CivilizationRepositories.getCivilizationRepository()
                     .getCivilizationByCitizen(player);
             if (civilization != null) {
                 bannerTag = BlockItem.getBlockEntityData(civilization.getBanner());
+                dyeColor = civilization.getDyeColor();
+            } else if (this.getType() == CivilizationBannerType.CAPITAL) {
+                bannerTag = BlockItem.getBlockEntityData(itemStack);
             }
+        } else if (this.getType() == CivilizationBannerType.CAPITAL) {
+            bannerTag = BlockItem.getBlockEntityData(itemStack);
         }
+
         if (bannerTag == null) {
             bannerTag = EMPTY_BANNER;
         }
-        DyeColor dyeColor = DyeColor.WHITE;
+
         if (bannerTag.contains("Base", Tag.TAG_INT)) {
             dyeColor = DyeColor.byId(bannerTag.getInt("Base"));
         }
+
         return BannerBlockEntity.createPatterns(dyeColor, bannerTag.getList("Patterns", Tag.TAG_COMPOUND));
     }
 }

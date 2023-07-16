@@ -13,10 +13,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.entity.BannerBlockEntity;
 import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -86,7 +83,11 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
         if (blockEntityData != null) {
             patternListTag = blockEntityData.getList("Patterns", Tag.TAG_COMPOUND)
                     .copy();
-            this.dyeColor = DyeColor.byId(blockEntityData.getInt("Base"));
+            if (pItem.getItem() instanceof BannerItem bannerItem) {
+                this.dyeColor = bannerItem.getColor();
+            } else {
+                this.dyeColor = DyeColor.byId(blockEntityData.getInt("Base"));
+            }
         } else {
             this.dyeColor = DyeColor.WHITE;
         }
@@ -321,6 +322,16 @@ public class CivilizationBannerBlockEntity extends BlockEntity implements Nameab
                     this.renameCivilization(bannerCivilization, itemInHand.getHoverName());
                     return InteractionResult.sidedSuccess(isClient);
                 }
+            } else if (itemInHand.getItem() instanceof BannerItem bannerItem) {
+                if (bannerCivilization == playerCivilization) {
+                    bannerCivilization.setBanner(itemInHand);
+                    bannerCivilization.setDyeColor(bannerItem.getColor());
+                    CivilizationRepositories.getCivilizationRepository()
+                            .upsertCivilization(bannerCivilization);
+                    this.checkRefresh(true);
+                    return InteractionResult.sidedSuccess(isClient);
+                }
+
             }
         }
 
