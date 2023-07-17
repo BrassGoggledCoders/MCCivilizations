@@ -8,9 +8,11 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.CivilizationChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ChangeType;
 import xyz.brassgoggledcoders.mccivilizations.network.CivilizationCitizenUpdatePacket;
@@ -58,8 +60,13 @@ public class CivilizationRepository extends Repository implements ICivilizationR
 
     @Override
     public void upsertCivilization(Civilization civilization) {
-        this.civilizationsById.put(civilization.getId(), civilization);
+        Civilization original = this.civilizationsById.put(civilization.getId(), civilization);
         this.addDirtyId(civilization.getId());
+        if (original == null) {
+            MinecraftForge.EVENT_BUS.post(new CivilizationChangedEvent(civilization, ChangeType.ADD));
+        } else {
+            MinecraftForge.EVENT_BUS.post(new CivilizationChangedEvent(civilization, ChangeType.UPDATED));
+        }
         if (sync) {
             NetworkHandler.getInstance()
                     .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.ADD, 11));
@@ -73,6 +80,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
             this.civilizationsByCitizen.put(citizen, civilization.getId());
             this.civilizationCitizens.put(civilization.getId(), citizen);
             this.addDirtyId(civilization.getId());
+            MinecraftForge.EVENT_BUS.post(new CivilizationChangedEvent(civilization, ChangeType.UPDATED));
             if (this.sync) {
                 NetworkHandler.getInstance()
                         .sendPacketToAll(new CivilizationCitizenUpdatePacket(
@@ -93,6 +101,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
             if (this.civilizationCitizens.remove(civilization.getId(), citizen)) {
                 this.civilizationsByCitizen.remove(citizen);
                 this.addDirtyId(civilization.getId());
+                MinecraftForge.EVENT_BUS.post(new CivilizationChangedEvent(civilization, ChangeType.UPDATED));
                 if (this.sync) {
                     NetworkHandler.getInstance()
                             .sendPacketToAll(new CivilizationCitizenUpdatePacket(
@@ -116,6 +125,7 @@ public class CivilizationRepository extends Repository implements ICivilizationR
             this.civilizationsByCitizen.remove(uuid);
         }
         this.addDirtyId(civilization.getId());
+        MinecraftForge.EVENT_BUS.post(new CivilizationChangedEvent(civilization, ChangeType.REMOVE));
         if (sync) {
             NetworkHandler.getInstance()
                     .sendPacketToAll(new CivilizationUpdatePacket(Collections.singleton(civilization), ChangeType.REMOVE, 11));

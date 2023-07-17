@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import journeymap.client.api.ClientPlugin;
 import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
+import journeymap.client.api.display.DisplayType;
 import journeymap.client.api.display.ModPopupMenu;
 import journeymap.client.api.display.PolygonOverlay;
 import journeymap.client.api.display.Waypoint;
@@ -24,6 +25,7 @@ import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
+import xyz.brassgoggledcoders.mccivilizations.api.civilization.CivilizationChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.LandClaimChangedEvent;
 import xyz.brassgoggledcoders.mccivilizations.api.location.Location;
@@ -51,6 +53,7 @@ public class JourneyMapPlugin implements IClientPlugin {
                 ClientEvent.Type.MAPPING_STOPPED, ClientEvent.Type.MAP_CLICKED));
         MinecraftForge.EVENT_BUS.addListener(this::onPopup);
         MinecraftForge.EVENT_BUS.addListener(this::onClaimChange);
+        MinecraftForge.EVENT_BUS.addListener(this::onCivilizationChange);
         MinecraftForge.EVENT_BUS.addListener(this::onLocationChange);
     }
 
@@ -65,7 +68,6 @@ public class JourneyMapPlugin implements IClientPlugin {
             this.onMouseMove(mouseMoveEvent);
         }
         if (clientEvent.type == ClientEvent.Type.MAPPING_STARTED) {
-
             this.clientAPI.getAllWaypoints()
                     .removeIf(waypoint -> waypoint.getModId().equals(MCCivilizations.MODID));
         }
@@ -111,6 +113,51 @@ public class JourneyMapPlugin implements IClientPlugin {
 
     private void onMouseMove(FullscreenMapEvent.MouseMoveEvent mouseMoveEvent) {
         this.lastPosition = mouseMoveEvent.getInfo();
+    }
+
+    private void onCivilizationChange(CivilizationChangedEvent civilization) {
+        if (civilization.getChangeType() == ChangeType.UPDATED) {
+            this.clientAPI.removeAll(MCCivilizations.MODID, DisplayType.Polygon);
+            for (Table.Cell<ResourceKey<Level>, ChunkPos, CivilizationDisplayable> cell : new ArrayList<>(this.claimedChunks.cellSet())) {
+                if (cell.getValue().civilization().getId().equals(civilization.getCivilization().getId())) {
+                    DyeColor dyeColor = civilization.getCivilization().getDyeColor();
+                    ChunkPos chunkPos = cell.getValue().chunkPos();
+                    CivilizationDisplayable newDisplayable = new CivilizationDisplayable(
+                            civilization.getCivilization(),
+                            cell.getValue().level(),
+                            chunkPos,
+                            new PolygonOverlay(
+                                    MCCivilizations.MODID,
+                                    "chunk_%d_%d".formatted(chunkPos.x, chunkPos.z),
+                                    cell.getValue().level(),
+                                    new ShapeProperties()
+                                            .setFillColor(dyeColor.getTextColor())
+                                            .setFillOpacity(0.1F)
+                                            .setStrokeColor(dyeColor.getTextColor())
+                                            .setStrokeOpacity(0.15F),
+                                    PolygonHelper.createChunkPolygon(
+                                            chunkPos.x,
+                                            0,
+                                            chunkPos.z
+                                    )
+                            )
+                    );
+                    this.claimedChunks.put(cell.getRowKey(), cell.getColumnKey(), newDisplayable);
+                    try {
+                        clientAPI.show(newDisplayable.displayable());
+                    } catch (Exception e) {
+                        MCCivilizations.LOGGER.error("Failed to Redisplay Claimed Chunk", e);
+                    }
+                } else {
+                    try {
+                        clientAPI.show(cell.getValue().displayable());
+                    } catch (Exception e) {
+                        MCCivilizations.LOGGER.error("Failed to Redisplay Claimed Chunk", e);
+                    }
+                }
+            }
+        }
+
     }
 
     private void onClaimChange(LandClaimChangedEvent claimChangedEvent) {
