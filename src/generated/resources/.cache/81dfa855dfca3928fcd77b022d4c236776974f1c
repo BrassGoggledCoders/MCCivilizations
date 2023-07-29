@@ -1,4 +1,4 @@
-// 1.19.2	2023-06-17T15:14:54.88297	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.19.2	2023-07-29T00:53:04.4443101	Registrate Provider for mccivilizations [Recipes, Advancements, Loot tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_hanging_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/capital_standing_banner.json
 07527a6ab7167dafdcd63fd5564a4a590454eaf2 assets/mccivilizations/blockstates/city_hanging_banner.json
@@ -19,4 +19,5 @@ cf0d6ef239aafb6c326e7d15413f20385b43630a data/mccivilizations/loot_tables/blocks
 679249cbb7f087546d02ac6add4380a0facf161c data/mccivilizations/recipes/capital_banner.json
 79fa8e02039911e353105ac536a36b3609657a47 data/mccivilizations/recipes/city_banner.json
 d480fb8b40d4e323c65f00c81f5381e3c8effb2a data/mccivilizations/recipes/decor_banner.json
+a37c8a7cf9e25ba9178196b0552e6c5e79567ffa data/mccivilizations/tags/entity_types/ignores_claims.json
 8b498182d94b88ac4846b3204d4b098975a7f15e data/mccivilizations/tags/items/no_cost_naming.json

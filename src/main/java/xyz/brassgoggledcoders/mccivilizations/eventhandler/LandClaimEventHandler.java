@@ -15,6 +15,7 @@ import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.Civilization;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.CivilizationRepositories;
+import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsEntityTags;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 
 @EventBusSubscriber(modid = MCCivilizations.MODID, bus = Bus.FORGE)
@@ -23,7 +24,7 @@ public class LandClaimEventHandler {
     @SubscribeEvent
     public static void mobGriefingEvent(EntityMobGriefingEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof Enemy) {
+        if (entity instanceof Enemy && !entity.getType().is(MCCivilizationsEntityTags.IGNORES_CLAIMS)) {
             if (CivilizationRepositories.getLandClaimRepository().isClaimed(entity.getLevel().dimension(), entity.chunkPosition())) {
                 event.setResult(Event.Result.DENY);
             }

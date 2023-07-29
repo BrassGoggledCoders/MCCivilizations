@@ -128,8 +128,7 @@ dependencies {
 
     implementation fg.deobf("com.tterrag.registrate:Registrate:MC1.19-1.1.5")
     jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "MC1.19-1.1.5") {
-        jarJar.pin(it, "MC1.19-1.1.5")
-        jarJar.ranged(it, "[MC1.19,MC1.19.3)")
+        jarJar.ranged(it, "[MC1.19-1.1.5,MC1.19.3)")
     }
 
     implementation fg.deobf("xyz.brassgoggledcoders.shadyskies:ContainerSyncing:1.2.2")
@@ -140,7 +139,7 @@ dependencies {
     implementation fg.deobf("com.minerarcana:Naming:1.19.2-1.3.2:nodep")
 
     compileOnly fg.deobf(group: 'info.journeymap', name: 'journeymap-api', version: '1.19.1-1.9-SNAPSHOT', changing: true)
-    runtimeOnly fg.deobf("curse.maven:journeymap-32274:4321645")
+    //runtimeOnly fg.deobf("curse.maven:journeymap-32274:4321645")
 }
 
 jar {

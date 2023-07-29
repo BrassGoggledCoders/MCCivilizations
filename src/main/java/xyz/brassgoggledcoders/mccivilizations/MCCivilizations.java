@@ -3,6 +3,7 @@ package xyz.brassgoggledcoders.mccivilizations;
 import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
 import com.tterrag.registrate.Registrate;
+import com.tterrag.registrate.providers.ProviderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
@@ -10,10 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import xyz.brassgoggledcoders.mccivilizations.command.MCCivilizationsCommand;
 import xyz.brassgoggledcoders.mccivilizations.compat.naming.NamingCompat;
-import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsBlocks;
-import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsLocationTypes;
-import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsRecipes;
-import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
+import xyz.brassgoggledcoders.mccivilizations.content.*;
 import xyz.brassgoggledcoders.mccivilizations.network.NetworkHandler;
 
 import java.util.function.Supplier;
@@ -25,7 +23,9 @@ public class MCCivilizations {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Supplier<Registrate> REGISTRATE = Suppliers.memoize(() -> Registrate.create(MODID));
+    private static final Supplier<Registrate> REGISTRATE = Suppliers.memoize(() -> Registrate.create(MODID)
+            .addDataGenerator(ProviderType.ENTITY_TAGS, MCCivilizationsEntityTags::generate)
+    );
 
     public MCCivilizations() {
         MCCivilizationsBlocks.setup();
