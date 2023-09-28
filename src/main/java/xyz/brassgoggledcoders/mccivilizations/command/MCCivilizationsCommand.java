@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.server.permission.PermissionAPI;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
+import xyz.brassgoggledcoders.mccivilizations.command.suggestion.CivilizationIdSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.command.suggestion.LocationIdSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.content.MCCivilizationsText;
 import xyz.brassgoggledcoders.mccivilizations.repository.RepositoryManager;
