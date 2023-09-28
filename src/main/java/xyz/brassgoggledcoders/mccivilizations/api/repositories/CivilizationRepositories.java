@@ -4,6 +4,7 @@ import com.google.common.base.Suppliers;
 import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.location.ILocationRepository;
+import xyz.brassgoggledcoders.mccivilizations.api.resource.IResourceRepository;
 
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
@@ -25,5 +26,9 @@ public class CivilizationRepositories {
 
     public static ILocationRepository getLocationRepository() {
         return SERVICE_PROVIDER.get().getLocationRepository();
+    }
+
+    public static IResourceRepository getResourceRepository() {
+        return SERVICE_PROVIDER.get().getResourceRepository();
     }
 }

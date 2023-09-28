@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryManager;
 import xyz.brassgoggledcoders.mccivilizations.api.location.LocationType;
+import xyz.brassgoggledcoders.mccivilizations.api.resource.Resource;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -20,6 +21,15 @@ public class MCCivilizationsRegistries {
 
     public static final Supplier<IForgeRegistry<LocationType>> LOCATION_TYPE_REGISTRY = Suppliers.memoize(() ->
             RegistryManager.ACTIVE.getRegistry(LOCATION_TYPE)
+    );
+
+    public static final ResourceKey<Registry<Resource>> RESOURCE = ResourceKey.createRegistryKey(new ResourceLocation(
+            "mccivilizations",
+            "resource"
+    ));
+
+    public static final Supplier<IForgeRegistry<Resource>> RESOURCE_REGISTRY = Suppliers.memoize(() ->
+            RegistryManager.ACTIVE.getRegistry(RESOURCE)
     );
 
     public static String getLocationTypeKey(LocationType locationType) {

@@ -2,6 +2,8 @@
   "block.mccivilizations.capital_standing_banner": "ɹǝuuɐᗺ ןɐʇıdɐƆ",
   "block.mccivilizations.city_standing_banner": "ɹǝuuɐᗺ ʎʇıƆ",
   "block.mccivilizations.decor_standing_banner": "ɹǝuuɐᗺ ǝʌıʇɐɹoɔǝᗡ",
+  "command.mccivilizations.resource_counts": "%s ɟo %s %d",
+  "command.mccivilizations.resource_counts_header": "%s ɹoɟ sʇunoƆ ǝɔɹnosǝᴚ",
   "text.mccivilizations.citizenship_required": "uoıʇɐzıןıʌıƆ ɐ ɟo uǝzıʇıɔ ɐ ǝq ʇsnɯ noʎ",
   "text.mccivilizations.city_settled": "ʎʇıƆ ɐ pǝןʇʇǝs ǝʌɐɥ noʎ",
   "text.mccivilizations.civilization_already_member": "uoıʇɐzıןıʌıƆ ɹǝɥʇouɐ ɟo uǝzıʇıɔ ɐ ʎpɐǝɹןɐ ǝɹɐ noʎ",

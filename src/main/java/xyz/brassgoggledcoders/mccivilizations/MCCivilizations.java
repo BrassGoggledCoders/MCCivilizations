@@ -29,6 +29,7 @@ public class MCCivilizations {
 
     public MCCivilizations() {
         MCCivilizationsBlocks.setup();
+        MCCivilizationsDataPackRegistries.setup();
         MCCivilizationsLocationTypes.setup();
         MCCivilizationsRecipes.setup();
         MCCivilizationsText.setup();

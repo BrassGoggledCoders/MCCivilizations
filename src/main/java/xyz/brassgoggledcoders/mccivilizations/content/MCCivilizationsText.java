@@ -73,6 +73,14 @@ public class MCCivilizationsText {
     public static final Component SAVE_ALL = MCCivilizations.getRegistrate()
             .addLang("text", MCCivilizations.rl("save_all"), "Saving all Civilization Data");
 
+    public static final Component RESOURCE_COUNTS_HEADER = MCCivilizations.getRegistrate()
+            .addLang("command", MCCivilizations.rl("resource_counts_header"), "Resource Counts for %s");
+    public static final Component RESOURCE_COUNTS = MCCivilizations.getRegistrate()
+            .addLang("command", MCCivilizations.rl("resource_counts"), "%d %s of %s");
+
+    public static final Component NO_VALUE_FOUND = MCCivilizations.getRegistrate()
+            .addLang("error", MCCivilizations.rl("no_value_found"), "No value found for %s");
+
     public static Component translate(Component component, Object... args) {
         if (component.getContents() instanceof TranslatableContents translatableContents) {
             return Component.translatable(translatableContents.getKey(), args);

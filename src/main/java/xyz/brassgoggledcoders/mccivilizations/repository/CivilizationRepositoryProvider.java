@@ -4,6 +4,7 @@ import xyz.brassgoggledcoders.mccivilizations.api.civilization.ICivilizationRepo
 import xyz.brassgoggledcoders.mccivilizations.api.claim.ILandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.location.ILocationRepository;
 import xyz.brassgoggledcoders.mccivilizations.api.repositories.ICivilizationRepositoryProvider;
+import xyz.brassgoggledcoders.mccivilizations.api.resource.IResourceRepository;
 import xyz.brassgoggledcoders.mccivilizations.civilization.CivilizationRepository;
 import xyz.brassgoggledcoders.mccivilizations.claim.LandClaimRepository;
 import xyz.brassgoggledcoders.mccivilizations.location.LocationRepository;
@@ -39,5 +40,10 @@ public class CivilizationRepositoryProvider implements ICivilizationRepositoryPr
         } else {
             return clientLocations;
         }
+    }
+
+    @Override
+    public IResourceRepository getResourceRepository() {
+        return null;
     }
 }

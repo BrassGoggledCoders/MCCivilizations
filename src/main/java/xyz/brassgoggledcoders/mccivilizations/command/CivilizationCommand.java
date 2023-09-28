@@ -49,7 +49,7 @@ public class CivilizationCommand {
 
     }
 
-    private static ArgumentBuilder<CommandSourceStack, ?> withCivilization(
+    public static ArgumentBuilder<CommandSourceStack, ?> withCivilization(
             String commandName,
             Function<ThrowingBiFunction<ICivilizationRepository, CommandContext<CommandSourceStack>, Stream<Civilization>, CommandSyntaxException>, Command<CommandSourceStack>> command
     ) {

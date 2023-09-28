@@ -6,7 +6,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.server.permission.PermissionAPI;
 import xyz.brassgoggledcoders.mccivilizations.MCCivilizations;
 import xyz.brassgoggledcoders.mccivilizations.command.suggestion.CivilizationIdSuggestionProvider;
 import xyz.brassgoggledcoders.mccivilizations.command.suggestion.LocationIdSuggestionProvider;
@@ -40,6 +39,7 @@ public class MCCivilizationsCommand {
                         .then(CivilizationCommand.create())
                         .then(LandClaimCommand.create())
                         .then(LocationCommand.create())
+                        .then(ResourceCommand.create())
                         .then(Commands.literal("sync")
                                 .executes(context -> {
                                     CommandSourceStack sourceStack = context.getSource();

@@ -2,6 +2,8 @@
   "block.mccivilizations.capital_standing_banner": "Capital Banner",
   "block.mccivilizations.city_standing_banner": "City Banner",
   "block.mccivilizations.decor_standing_banner": "Decorative Banner",
+  "command.mccivilizations.resource_counts": "%d %s of %s",
+  "command.mccivilizations.resource_counts_header": "Resource Counts for %s",
   "text.mccivilizations.citizenship_required": "You must be a citizen of a Civilization",
   "text.mccivilizations.city_settled": "You have settled a City",
   "text.mccivilizations.civilization_already_member": "You are already a citizen of another Civilization",
